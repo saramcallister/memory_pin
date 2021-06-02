@@ -1,0 +1,10 @@
+pin-*
+*.swp
+__pycache__/
+*.py[cod]
+
+# pin build
+MemTrace/obj-intel64/
+MemTrace/*.out
+MemTrace/*.pdf
+MemTrace/*.err
