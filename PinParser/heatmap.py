@@ -1,64 +1,52 @@
 #!/usr/bin/python3  
 
-from collections import defaultdict
-
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
-def convert_to_page(mem_addr):
-    # shift by 2^12 = 4KB
-    return mem_addr >> 12
+import numpy as np
+from collections import defaultdict
 
-def parse_input(filename, lines=float('inf'), endtime=float('inf')):
-    timestamps = []
-    count = -1
-    num_accesses = {}
-    with open(filename, 'r') as f:
-        for i, line in enumerate(f):
-            if i > lines:
-                break
-            if 'Seconds' in line:
-                ts = float(line.split()[1])
-                if last_timestamp > endtime:
-                    break
-                timestamps.append(ts)
-                count += 1
-                for page in num_accesses.keys():
-                    num_accesses[page].append(0)
-                continue
-            
-            # otherwise input is "ipc: W/R addr"
-            # addr is 0xffffffffffff for 64 byte loads
-            address = line.split()[-1]
-            page = convert_to_page(int(address, 0))
+import parser
 
-            if page not in num_accesses:
-                new_l = [0] * count
-                new_l[-1] += 1
-                num_accesses[page] = new_l
-            else:
-                num_accesses[page][-1] += 1
-    print(timestamps[-1], "s")
-    return timestamps, num_accesses
+def sorted_keys(num_accesses):
+    page_to_accesses = defaultdict(int)
+    for timeperiod in num_accesses:
+        for entry in timeperiod:
+            page_to_accesses[entry[0]] += entry[1]
+    sa = sorted(page_to_accesses.items(), key=lambda x: -x[1])
+    pages, count = zip(*sa)
+    return pages
+
+def get_sorted_matrix(pages, accesses, x_binning):
+    m = np.zeros((len(pages), x_binning + 1))
+    for i, timeperiod in enumerate(accesses):
+        for entry in timeperiod:
+            page_order = pages.index(entry[0])
+            m[page_order][int( (i / len(accesses)) * x_binning)] += entry[1]
+    return m
 
 def get_matrix(num_accesses):
-    sa = sorted(num_accesses.items(), key=lambda x: x[0])
-    pages, counts = zip(*sa)
-    return pages, counts
+    binning = 1 << 14
+    max_value = max([int(item[0]) for timeperiod in accesses for item in timeperiod])
+    min_value = min([int(item[0]) for timeperiod in accesses for item in timeperiod])
+    print(max_value)
+    print(min_value)
+    num_buckets = (max_value - min_value) // binning + 1
+    m = np.zeros((num_buckets, len(num_accesses))) 
+    for i, timeperiod in enumerate(num_accesses):
+        for entry in timeperiod:
+            m[(int(entry[0]) - min_value) // binning][i] += entry[1]
+    return m
 
-def graph(counts, savefile):
-    x = list(range(len(counts)))
-    plt.plot(x, counts, linestyle='-', linewidth=2)
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.ylabel('Count')
-    plt.xlabel('Popularity')
+def graph(m, savefile):
+    plt.imshow(m, cmap='viridis', aspect='auto')
+    plt.colorbar()
     plt.savefig(savefile)
     print(f'Saved to {savefile}')
 
 
-timestamps, accesses = parse_input("/scratch/cpu2017pin/519.lbm_r", endtime=6000)
-pages, counts = get_matrix(accesses)
-print(len(pages))
-graph(counts, 'acccesses.pdf')
+t, a = parser.parse_input("/scratch/cpu2017pin/627.cam4_r", end_time=60)
+m = get_sorted_matrix(sorted_keys(a), a, 60)
+print(f"Execution time: {t[-1]}")
+graph(m, 'acccesses.pdf')
