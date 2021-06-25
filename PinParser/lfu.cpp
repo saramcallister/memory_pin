@@ -1,73 +1,19 @@
 #include <algorithm>
 #include <cstdint>
+#include <errno.h>
 #include <fstream>
 #include <iostream>
 #include <queue>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <unistd.h>
 #include <unordered_map>
 #include <vector>
 
-struct EntryHeader {
-    double time;
-    uint64_t instructions;
-    uint64_t num_pages;
-};
+#include "parser.hpp"
 
-struct PageEntry {
-    uint64_t page_num;
-    uint64_t accesses;
-
-    PageEntry(uint64_t pn, uint64_t a) {
-        page_num = pn;
-        accesses = a;
-    }
-
-    PageEntry() {}
-};
-
-class PageEntryComparator {
-public:
-    int operator() (const PageEntry& pe1, const PageEntry& pe2) {
-        return pe1.accesses < pe2.accesses;
-    }
-};
-
-FILE* trace;
-
-struct EntireEntry {
-    EntryHeader eh;
-    std::vector<PageEntry> pe_list;
-    bool valid;
-};
-
-EntireEntry readFormatted() {
-    EntireEntry ee;
-    ee.valid = true;
-    size_t ret = fread(&ee.eh, sizeof(ee.eh), 1, trace);
-    if (ret != 1) {
-        ee.valid = false;
-        return ee;
-    }
-
-    if (ee.eh.num_pages == 0) {
-        return ee;
-    }
-
-    PageEntry pe;
-    std::vector<PageEntry> pe_list;
-    ee.pe_list.reserve(ee.eh.num_pages);
-    for (uint64_t i = 0; i < ee.eh.num_pages; i++) {
-        ret = fread(&pe, sizeof(pe), 1, trace);
-        if (ret != 1) {
-            ee.valid = false;
-            return ee;
-        }
-        ee.pe_list.push_back(pe);
-    }
-    return ee;
-}
+TraceFile trace;
 
 std::unordered_map<uint64_t, uint64_t> aggregatePages(int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
     std::unordered_map<uint64_t, uint64_t> page_to_count;
@@ -77,7 +23,7 @@ std::unordered_map<uint64_t, uint64_t> aggregatePages(int64_t instr_limit = std:
     bool first = true;
     while (instr_limit > seen_instr - start_instr) {
         num_reads ++;
-        EntireEntry ee = readFormatted();
+        EntireEntry ee = trace.readNextEntry();
         if (!ee.valid) {
             break;
         }
@@ -91,9 +37,9 @@ std::unordered_map<uint64_t, uint64_t> aggregatePages(int64_t instr_limit = std:
         for (auto pe: ee.pe_list) {
             auto it = page_to_count.find(pe.page_num);
             if (it == page_to_count.end()) {
-                page_to_count[pe.page_num] = std::min<uint64_t>(pe.accesses, 64);
+                page_to_count[pe.page_num] = pe.accesses; //std::min<uint64_t>(pe.accesses, 64);
             } else {
-                it->second += std::min<uint64_t>(pe.accesses, 64);
+                it->second += pe.accesses; //std::min<uint64_t>(pe.accesses, 64);
             }
         }
         if (num_reads % 1001 == 1000) {
@@ -135,7 +81,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    trace = fopen(argv[1], "r");
+    trace.setTraceFile(argv[1]);
 
     auto mapping = aggregatePages();
 

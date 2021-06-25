@@ -8,3 +8,7 @@ MemTrace/obj-intel64/
 MemTrace/*.out
 MemTrace/*.pdf
 MemTrace/*.err
+PinParser/*.pdf
+PinParser/5*
+PinParser/6*
+PinParser/*.o
