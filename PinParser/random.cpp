@@ -56,7 +56,7 @@ void outputHitsMisses(uint64_t local_pages, std::unordered_map<uint64_t, uint64_
 
     uint64_t all_pages = accesses.size();
     for (auto entry: accesses) {
-        bool try_local = fastrand() % all_pages;
+        bool try_local = fastrand() % all_pages <= local_pages;
         if (try_local && allocated_local < local_pages) {
             hits += entry.second;
             allocated_local++;

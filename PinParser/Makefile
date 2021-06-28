@@ -1,10 +1,13 @@
 CXX=g++
 CXXFLAGS=-g -Wall -std=c++17
 
-all: lfu dynamic_lfu working_set_size hfa first_seen random
+all: lfu dynamic_lfu working_set_size hfa first_seen random goanna0
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
+
+goanna0: parser.o goanna0.o 
+	$(CXX) -o goanna0 goanna0.o parser.o
 
 first_seen: parser.o first_seen.o 
 	$(CXX) -o first_seen first_seen.o parser.o
@@ -22,6 +25,8 @@ working_set_size: parser.o working_set_size.o
 	$(CXX) -o working_set_size working_set_size.o parser.o
 
 lfu.o: lfu.cpp parser.hpp
+
+goanna0.o: goanna0.cpp parser.hpp
 
 first_seen.o: first_seen.cpp parser.hpp
 
