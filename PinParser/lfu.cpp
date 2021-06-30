@@ -37,17 +37,17 @@ std::unordered_map<uint64_t, uint64_t> aggregatePages(int64_t instr_limit = std:
         for (auto pe: ee.pe_list) {
             auto it = page_to_count.find(pe.page_num);
             if (it == page_to_count.end()) {
-                page_to_count[pe.page_num] = pe.accesses; //std::min<uint64_t>(pe.accesses, 64);
+                page_to_count[pe.page_num] = std::min<uint64_t>(pe.accesses, 64);
             } else {
-                it->second += pe.accesses; //std::min<uint64_t>(pe.accesses, 64);
+                it->second += std::min<uint64_t>(pe.accesses, 64);
             }
         }
         if (num_reads % 1001 == 1000) {
             //fprintf(stdout, "Read through %d entries, %ld instructions\n", num_reads, seen_instr - start_instr);
-            std::cout << '.';
+            std::cerr << '.';
         }
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
     return page_to_count;
 }
 
