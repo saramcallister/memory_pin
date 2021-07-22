@@ -10,6 +10,7 @@ Point = namedtuple('Point', ['local_pages', 'segment_size', 'hits', 'misses'])
 
 def parse_file(filename):
     # file format: num local pages, 4k pages per segments, hits, misses
+    print(f"Parsing {filename}")
 
     output = []
     with open(filename, 'r') as f:
@@ -36,6 +37,6 @@ def graph(grouping_to_mr, savefile):
     plt.savefig(savefile)
     print(f'Saved to {savefile}')
 
-parsed = parse_file('557.segmented_lfu')
+parsed = parse_file('657.segmented_lfu')
 mrs = lines(parsed)
 graph(mrs, 'segmented_lfu.pdf')
