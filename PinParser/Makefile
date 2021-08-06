@@ -1,7 +1,17 @@
 CXX=g++
 CXXFLAGS=-g -Wall -std=c++17
 
-all: lfu dynamic_lfu working_set_size hfa first_seen random goanna0 segmented_lfu create_slfu_file compare
+all: lfu \
+	dynamic_lfu \
+	working_set_size \
+	hfa \
+	first_seen \
+	random \
+	goanna0 \
+	segmented_lfu \
+	create_slfu_file \
+	compare \
+	pagemap_read
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
@@ -33,6 +43,9 @@ create_slfu_file: parser.o create_slfu_file.o
 compare: parser.o compare.o
 	$(CXX) -o compare compare.o parser.o
 
+pagemap_read: pagemap_read.o
+	$(CXX) -o pagemap_read pagemap_read.o
+
 lfu.o: lfu.cpp parser.hpp
 
 goanna0.o: goanna0.cpp parser.hpp
@@ -54,3 +67,5 @@ create_slfu_file.o: create_slfu_file.cpp parser.hpp
 parser.o: parser.cpp parser.hpp
 
 compare.o: compare.cpp parser.hpp
+
+pagemap_read.o: pagemap_read.cpp

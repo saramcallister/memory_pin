@@ -61,6 +61,7 @@ void writePopularPages(std::unordered_map<uint64_t, uint64_t> aggregated_pages) 
     }
 
     unsigned long total_pages = aggregated_pages.size();
+    std::cout << total_pages << std::endl;
     fwrite(&total_pages, sizeof(unsigned long), 1, outfile);
     while (pq.empty() == false) {
         PageEntry pe = pq.top();
