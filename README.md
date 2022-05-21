@@ -1,4 +1,4 @@
-# memory_pin
+# memory_pi
 
 MemoryTrace:
 - download Intel pin to top level dir

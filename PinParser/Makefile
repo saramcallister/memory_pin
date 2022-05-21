@@ -11,10 +11,18 @@ all: lfu \
 	segmented_lfu \
 	create_slfu_file \
 	compare \
-	pagemap_read
+	pagemap_read \
+    pebs \
+    ad
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
+
+pebs: parser.o pebs.o 
+	$(CXX) -o pebs pebs.o parser.o
+
+ad: parser.o ad.o 
+	$(CXX) -o ad ad.o parser.o
 
 goanna0: parser.o goanna0.o 
 	$(CXX) -o goanna0 goanna0.o parser.o
@@ -47,6 +55,10 @@ pagemap_read: pagemap_read.o
 	$(CXX) -o pagemap_read pagemap_read.o
 
 lfu.o: lfu.cpp parser.hpp
+
+pebs.o: pebs.cpp parser.hpp
+
+ad.o: ad.cpp parser.hpp
 
 goanna0.o: goanna0.cpp parser.hpp
 

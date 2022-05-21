@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <unordered_set>
+#include <vector>
 
 #define PAGEMAP_FILE "/proc/pid/pagemap"
 

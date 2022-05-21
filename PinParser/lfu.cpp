@@ -71,6 +71,9 @@ void getPopularPages(std::unordered_map<uint64_t, uint64_t> aggregated_pages, ui
         pq.pop();
     }
 
+    fprintf(stdout, "Hits + misses: %ld, pages_taken: %ld\n", hits+misses,
+    pages_taken);
+
     fprintf(stdout, "Hits: %ld Misses: %ld Miss Ratio: %f\n", hits, misses, misses / (double) (hits + misses));
 }
 

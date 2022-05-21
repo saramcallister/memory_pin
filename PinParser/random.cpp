@@ -64,7 +64,8 @@ void outputHitsMisses(uint64_t local_pages, std::unordered_map<uint64_t, uint64_
             misses += entry.second;
         }
     }
-    fprintf(outfile, "%ld %ld %ld\n", local_pages, hits, misses);
+    fprintf(outfile, "%ld %ld %ld %f\n", local_pages, hits, misses, ( (double)
+    misses)/(hits+misses));
 }
 
 int main(int argc, char* argv[]) {
