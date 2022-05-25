@@ -38,9 +38,10 @@ bool cmp ( std::pair <uint64_t, uint64_t> a, std::pair <uint64_t, uint64_t> b) {
     return a.second > b.second;
 }
 
-void checkSimilarity() {
+void checkSimilarity(int num_bits) {
 
     std::unordered_set<uint64_t> page_set;
+    std::unordered_set<uint64_t> top_ad_pages;
     uint64_t pg_count = 0;
     uint64_t count = 0;
 
@@ -63,18 +64,40 @@ void checkSimilarity() {
 //     limit = sorted_ad.size()/10;
     limit = sorted_ad.size()*percent_hot_pages;
 
+    uint64_t curr_count = num_bits;
     for( auto i : sorted_ad) {
+        if(i.second < curr_count) {
+            if(count >= limit) {
+                break;      // we have already added enough pages
+            } else {
+                curr_count = i.second;
+            }
+        }
 
-       if(count < limit) {
-           if(page_set.find(i.first) != page_set.end()) {
-             pg_count++;
-           }
-           count++;
-       }
-       else {
-           break;
-       }
+        if(i.second > curr_count) {
+            fprintf(stderr, "THIS SHOULDN'T BE REACHED\n");
+            exit(-1);
+        }
+        count ++;
 
+        top_ad_pages.insert(i.first);
+
+//        if(count < limit) {
+//            if(page_set.find(i.first) != page_set.end()) {
+//              pg_count++;
+//            }
+//            count++;
+//        }
+//        else {
+//            break;
+//        }
+
+    }
+
+    for(auto i: top_ad_pages) {
+        if(page_set.find(i) != page_set.end()) {
+            pg_count++;
+        }
     }
 
     fprintf(stdout, "ad could identify %f of the top %f%% pages\n",
@@ -104,7 +127,8 @@ void analyze_trace(bool gen_file_data, int num_bits, float sample_time,
                     int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
     std::unordered_map<uint64_t, uint64_t> page_to_count;
     std::unordered_map<uint64_t, uint64_t> page_to_ad_bits;
-    std::unordered_set<uint64_t> accessed_pages;
+//     std::unordered_set<uint64_t> accessed_pages;
+    std::unordered_map<uint64_t, uint64_t> accessed_pages;
 
     int64_t seen_instr = 0;
     int num_reads = 0;
@@ -142,19 +166,20 @@ void analyze_trace(bool gen_file_data, int num_bits, float sample_time,
             auto it2 = accessed_pages.find(pe.page_num);
             if (it2 == accessed_pages.end()) {   // when using a page, mark it as
                                             //accessed
-                accessed_pages.insert(pe.page_num);
+//                 accessed_pages.insert(pe.page_num);
+                accessed_pages[pe.page_num] = 1;
             }
         }
 
         if((ee.eh.time - last_sample_time) >= sample_time) {
             for (auto entry : accessed_pages) {
-                auto it = page_to_ad_bits.find(entry);
+                auto it = page_to_ad_bits.find(entry.first);
 
                 if(it == page_to_ad_bits.end()) {
-                    page_to_ad_bits[entry] = 1;
+                    page_to_ad_bits[entry.first] = 1;
                 } else {
-                    page_to_ad_bits[entry]++;
-                    page_to_ad_bits[entry] %= (num_bits +1);
+                    page_to_ad_bits[entry.first]++;
+                    page_to_ad_bits[entry.first] %= (num_bits +1);
                 }
             }
 
@@ -167,13 +192,26 @@ void analyze_trace(bool gen_file_data, int num_bits, float sample_time,
             sorted_ad = sort(page_to_ad_bits);
             sorted_truth = sort(page_to_count);
 
+
+//             fprintf(stderr, "ad\n");
+//             for(auto it: sorted_ad) {
+//                 fprintf(stderr, "%ld %ld \n", it.first, it.second);
+//             }
+//             fprintf(stderr, "pebs\n");
+//             for(auto it: sorted_truth) {
+//                 fprintf(stderr, "%ld %ld \n", it.first, it.second);
+//             }
+// 
             fprintf(stdout, "bit number: %d, time: %f\n",num_bits, ee.eh.time);
-            checkSimilarity();
+            checkSimilarity(num_bits);
 
             last_analyze_time += sample_time*num_bits;
 
             page_to_count.clear();
             page_to_ad_bits.clear();
+
+            sorted_ad.clear();
+            sorted_truth.clear();
 
         }
         
