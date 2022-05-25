@@ -15,9 +15,13 @@
 
 #include "parser.hpp"
 // #define PEBS_FREQ 5000
-#define SAMPLE_TIME_IN_S 5 // TODO: made tunable
-#define PIN_TIME_SCALE 30 // TODO: make this tunable - per workload?
-#define MAX_ITERATIONS 10 // TODO: made tunable 
+// #define SAMPLE_TIME_IN_S 10 // TODO: made tunable
+// #define SAMPLE_TIME_IN_S 5 // TODO: made tunable
+// #define PIN_TIME_SCALE 30 // TODO: make this tunable - per workload? currently
+                          // only for 505
+// #define PIN_TIME_SCALE 63.5
+#define MAX_BITS 1 // TODO: made tunable 
+#define MAX_SAMPLE_TIME (SAMPLE_TIME_IN_S * PIN_TIME_SCALE * MAX_BITS)
 
 std::vector<std::pair<uint64_t, uint64_t>> sorted_ad;
 std::vector<std::pair<uint64_t, uint64_t>> sorted_truth;
@@ -28,63 +32,11 @@ uint64_t total_pebs;
 uint64_t total_truth;
 std::fstream fptr;
 
+float percent_hot_pages;
+
 bool cmp ( std::pair <uint64_t, uint64_t> a, std::pair <uint64_t, uint64_t> b) {
     return a.second > b.second;
 }
-
-// void read_from_sorted() {
-//     std::pair<uint64_t, uint64_t> read;
-//     bool read_pebs = true;
-// 
-//     fptr.seekg(0, fptr.beg);
-// 
-//     while(fptr) {
-//         fptr.read((char *)&read, sizeof(read));
-//         if(fptr) {
-//             if(read.second == 0) {
-//                 read_pebs = false;
-//                 continue;
-//             }
-//             if(read_pebs) {
-//                 sorted_pebs.push_back(read);
-//             } else {
-//                 sorted_truth.push_back(read);
-//             }
-//         }
-//     }
-// 
-//     for( auto it : sorted_pebs) {
-//         total_pebs += it.second;
-//     }
-//     for( auto it : sorted_truth) {
-//         total_truth += it.second;
-//     }
-// 
-// }
-
-// void compare() {
-// 
-//     for (auto it: truth_read) {
-//         auto found = std::find(sorted_truth.begin(), sorted_truth.end(),
-//         it);
-// 
-//         if( found == sorted_truth.end() || it.second != found->second) {
-//             fprintf(stderr, "read and sorted is not the same\n");
-//             exit(1);
-//         }
-//     }
-// 
-//     for (auto it: pebs_read) {
-//         auto found = std::find(sorted_pebs.begin(), sorted_pebs.end(),
-//         it);
-// 
-//         if( found == sorted_pebs.end() || it.second != found->second) {
-//             fprintf(stderr, "read and sorted is not the same\n");
-//             exit(1);
-//         }
-//     }
-// 
-// }
 
 void checkSimilarity() {
 
@@ -92,7 +44,8 @@ void checkSimilarity() {
     uint64_t pg_count = 0;
     uint64_t count = 0;
 
-    uint64_t limit = sorted_truth.size()/10;
+//     uint64_t limit = sorted_truth.size()/10;
+    uint64_t limit = sorted_truth.size()*percent_hot_pages;
 
     for( auto i : sorted_truth) {
 
@@ -107,7 +60,8 @@ void checkSimilarity() {
     }
 
     count = 0;
-    limit = sorted_ad.size()/10;
+//     limit = sorted_ad.size()/10;
+    limit = sorted_ad.size()*percent_hot_pages;
 
     for( auto i : sorted_ad) {
 
@@ -123,8 +77,8 @@ void checkSimilarity() {
 
     }
 
-    fprintf(stdout, "ad could identify %f of the top 10%% pages\n",
-    ((float) pg_count/limit));
+    fprintf(stdout, "ad could identify %f of the top %f%% pages\n",
+    ((float) pg_count/(sorted_truth.size() * percent_hot_pages)), percent_hot_pages*100);
     fprintf(stdout, 
         "pg_count: %ld, sorted_truth.size(): %ld, sorted_ad.size(): %ld\n", 
             pg_count, sorted_truth.size(), sorted_ad.size());
@@ -146,19 +100,18 @@ std::vector<std::pair<uint64_t, uint64_t>> sort (
 
 TraceFile trace;
 
-void analyze_trace(bool gen_file_data, 
+void analyze_trace(bool gen_file_data, int num_bits, float sample_time, 
                     int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
     std::unordered_map<uint64_t, uint64_t> page_to_count;
-    std::unordered_map<uint64_t, uint64_t> pages_seen;
-
-//     std::unordered_set<uint64_t> pages_seen;
+    std::unordered_map<uint64_t, uint64_t> page_to_ad_bits;
+    std::unordered_set<uint64_t> accessed_pages;
 
     int64_t seen_instr = 0;
     int num_reads = 0;
     int64_t start_instr = 0;
     bool first = true;
-    double time_stamp; 
-    int num_iterations;
+    double last_sample_time, last_analyze_time; 
+//     int sample_time = SAMPLE_TIME_IN_S * PIN_TIME_SCALE * num_bits;
 
     while (instr_limit > seen_instr - start_instr) {
         num_reads ++;
@@ -170,24 +123,11 @@ void analyze_trace(bool gen_file_data,
         if (first) {
             start_instr = ee.eh.instructions;
             first = false;
-            time_stamp = ee.eh.time;
+            last_sample_time = ee.eh.time;
+            last_analyze_time = ee.eh.time;
         }
 
         seen_instr += ee.eh.instructions;
-
-        if((ee.eh.time - time_stamp) >= (SAMPLE_TIME_IN_S * PIN_TIME_SCALE *
-            MAX_ITERATIONS)) {
-
-            sorted_ad = sort(pages_seen);
-            sorted_truth = sort(page_to_count);
-
-            checkSimilarity();
-
-
-            // what do we want to analyze? we also have to clear pages_seen and
-            // pages_to_count in here every 10s 
-
-        }
 
         for (auto pe: ee.pe_list) {
 
@@ -199,90 +139,76 @@ void analyze_trace(bool gen_file_data,
             }
             total_truth += pe.accesses;
 
-            it = pages_seen.find(pe.page_num);
-            if (it == pages_seen.end()) {
-                pages_seen[pe.page_num] = 1;
-            } else {
-//                 pages_seen[pe.page_num] += 1;
-                pages_seen[pe.page_num]++;
-                pages_seen[pe.page_num] %= 10;
+            auto it2 = accessed_pages.find(pe.page_num);
+            if (it2 == accessed_pages.end()) {   // when using a page, mark it as
+                                            //accessed
+                accessed_pages.insert(pe.page_num);
             }
-//             pages_seen.insert(pe.page_num);
         }
 
+        if((ee.eh.time - last_sample_time) >= sample_time) {
+            for (auto entry : accessed_pages) {
+                auto it = page_to_ad_bits.find(entry);
+
+                if(it == page_to_ad_bits.end()) {
+                    page_to_ad_bits[entry] = 1;
+                } else {
+                    page_to_ad_bits[entry]++;
+                    page_to_ad_bits[entry] %= (num_bits +1);
+                }
+            }
+
+            last_sample_time += sample_time;
+
+            accessed_pages.clear(); // clear ad bits every sample cycle
+        }
+
+        if((ee.eh.time - last_analyze_time) >= sample_time*num_bits) {
+            sorted_ad = sort(page_to_ad_bits);
+            sorted_truth = sort(page_to_count);
+
+            fprintf(stdout, "bit number: %d, time: %f\n",num_bits, ee.eh.time);
+            checkSimilarity();
+
+            last_analyze_time += sample_time*num_bits;
+
+            page_to_count.clear();
+            page_to_ad_bits.clear();
+
+        }
         
         if (num_reads % 1001 == 1000) {
             std::cerr << '.';
         }
     }
 
-//     sorted_pebs = sort(pebs_count);
-// 
-//     for( auto it: sorted_pebs) {
-//         total_pebs += it.second;
-//     }
-//     sorted_truth = sort(page_to_count);
-// 
-//    if(gen_file_data)  {
-//        for(auto it: sorted_pebs) {
-//            fptr.write((char*)&it, sizeof(it));
-//        }
-// 
-//        std::pair<uint64_t, uint64_t> sep;
-//        sep.first = 0;
-//        sep.second = 0;
-// 
-//        fptr.write((char*)&sep, sizeof(sep));
-// 
-//        for(auto it: sorted_truth) {
-//            fptr.write((char*)&it, sizeof(it));
-//        }
-// 
-//     }
-
     std::cerr << std::endl;
 }
 
 int main(int argc, char* argv[]) {
 
-    if (argc < 2) {
-        std::cerr << "./pebs tracefile [ [-g] sorted_trace_file]" << std::endl;
+    if(argc < 6) {
+        std::cerr << "./ad tracefile percent_hot_pages num_bits time_scale sample_time" << std::endl;
         return 1;
-    }
-    bool use_file_data = false;
-    bool gen_file_data = false;
-
-    if( argc >= 3) {
-        if( strcmp(argv[2], "-g") == 0) {
-            if(argc > 4) {
-                std::cerr << "./pebs tracefile [ [-g] sorted_trace_file]" << std::endl;
-                return 1;
-            } else {
-                fptr.open(argv[3], std::fstream::in | std::fstream::out | std::fstream::trunc | std::ios::in | std::ios::out | std::ios::binary);
-                std::cerr << "Error: " << strerror(errno) << " line 282" << std::endl;
-                gen_file_data = true;
-            }
-        } else {
-            fptr.open(argv[2], std::ios::in | std::ios::out | std::ios::binary);
-            std::cerr << "Error: " << strerror(errno) << " line 288" << std::endl;
-            
-            use_file_data = true;
-        }
     }
 
     trace.setTraceFile(argv[1]);
 
-//     if(use_file_data) {
-//         read_from_sorted();
-//     } else {
-//         analyze_trace(gen_file_data);
-//     }
+    float percent_input = std::stoi(argv[2]);
 
-    analyze_trace(true);
+    int num_bits = std::stoi(argv[3]);
+    
+    float time_scale = std::stof(argv[4]);
 
-    fptr.close();
+    int sample_time = std::stoi(argv[5]);
 
-//     checkSimilarity();
+    percent_hot_pages = percent_input/100;
+    fprintf(stdout, "percent hot pages: %f\n", percent_hot_pages);
+    fprintf(stdout, "num_bits: %d\n", num_bits);
+    fprintf(stdout, "time_scale: %f\n", time_scale);
+    fprintf(stdout, "sample_time: %d\n", sample_time);
+
+    analyze_trace(false, num_bits, time_scale*sample_time);
 
 }
 

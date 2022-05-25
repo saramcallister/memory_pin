@@ -1,0 +1,21 @@
+percent hot pages: 0.050000
+num_bits: 4
+num_bits: 4
+bit number: 4 time: 1270.000000
+ad could identify 0.061278 of the top 5.000000% pages
+pg_count: 684 sorted_truth.size(): 223246 sorted_ad.size(): 223246
+bit number: 4 time: 2540.000000
+ad could identify 0.053842 of the top 5.000000% pages
+pg_count: 601 sorted_truth.size(): 223247 sorted_ad.size(): 223247
+bit number: 4 time: 3810.000000
+ad could identify 0.061636 of the top 5.000000% pages
+pg_count: 688 sorted_truth.size(): 223247 sorted_ad.size(): 223247
+bit number: 4 time: 5080.000000
+ad could identify 0.061277 of the top 5.000000% pages
+pg_count: 684 sorted_truth.size(): 223247 sorted_ad.size(): 223247
+bit number: 4 time: 6350.000000
+ad could identify 0.063427 of the top 5.000000% pages
+pg_count: 708 sorted_truth.size(): 223248 sorted_ad.size(): 223248
+bit number: 4 time: 7620.000000
+ad could identify 0.030191 of the top 5.000000% pages
+pg_count: 337 sorted_truth.size(): 223249 sorted_ad.size(): 223249

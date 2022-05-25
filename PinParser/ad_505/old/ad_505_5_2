@@ -1,0 +1,54 @@
+percent hot pages: 0.050000
+num_bits: 2
+num_bits: 2
+bit number: 2 time: 600.010000
+ad could identify 0.056364 of the top 5.000000% pages
+pg_count: 12 sorted_truth.size(): 4258 sorted_ad.size(): 4258
+bit number: 2 time: 1200.000000
+ad could identify 0.001827 of the top 5.000000% pages
+pg_count: 15 sorted_truth.size(): 164212 sorted_ad.size(): 164212
+bit number: 2 time: 1800.000000
+ad could identify 0.062323 of the top 5.000000% pages
+pg_count: 536 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 2400.000000
+ad could identify 0.146970 of the top 5.000000% pages
+pg_count: 1264 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 3000.000000
+ad could identify 0.004651 of the top 5.000000% pages
+pg_count: 40 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 3600.000000
+ad could identify 0.006395 of the top 5.000000% pages
+pg_count: 55 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 4200.000000
+ad could identify 0.000116 of the top 5.000000% pages
+pg_count: 1 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 4800.000000
+ad could identify 0.005465 of the top 5.000000% pages
+pg_count: 47 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 5400.010000
+ad could identify 0.003256 of the top 5.000000% pages
+pg_count: 28 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 6000.000000
+ad could identify 0.076973 of the top 5.000000% pages
+pg_count: 662 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 6600.000000
+ad could identify 0.012209 of the top 5.000000% pages
+pg_count: 105 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 7200.000000
+ad could identify 0.104879 of the top 5.000000% pages
+pg_count: 902 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 7800.000000
+ad could identify 0.017906 of the top 5.000000% pages
+pg_count: 154 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 8400.000000
+ad could identify 0.019999 of the top 5.000000% pages
+pg_count: 172 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 9000.000000
+ad could identify 0.018836 of the top 5.000000% pages
+pg_count: 162 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 9600.000000
+ad could identify 0.086973 of the top 5.000000% pages
+pg_count: 748 sorted_truth.size(): 172008 sorted_ad.size(): 172008
+bit number: 2 time: 10200.000000
+ad could identify 0.021278 of the top 5.000000% pages
+pg_count: 183 sorted_truth.size(): 172008 sorted_ad.size(): 172008

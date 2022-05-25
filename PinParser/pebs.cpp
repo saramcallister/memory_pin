@@ -16,6 +16,7 @@
 
 #include "parser.hpp"
 #define PEBS_FREQ 5000
+#define PEBS_PERIOD 0.01
 #define TRACEFILE_INDEX 1 
 #define PERCENT_HOT_INDEX 2 
 #define GEN_FLAG_INDEX 3
@@ -163,6 +164,8 @@ void analyze_trace(bool gen_file_data,
     int64_t start_instr = 0;
     bool first = true;
     uint64_t access_counter=0;
+    double time_stamp;
+    float sample_time = PEBS_PERIOD * 63.5; //TODO: make general
 
     while (instr_limit > seen_instr - start_instr) {
         num_reads ++;
@@ -176,9 +179,22 @@ void analyze_trace(bool gen_file_data,
         if (first) {
             start_instr = ee.eh.instructions;
             first = false;
+            time_stamp = ee.eh.time;
         }
 
         seen_instr += ee.eh.instructions;
+
+        if((ee.eh.time - time_stamp) >= sample_time) {
+            sorted_pebs = sort(pebs_count);
+
+            for( auto it: sorted_pebs) {
+                total_pebs += it.second;
+            }
+            fprintf(stdout, "time: %f\n", ee.eh.time);
+            sorted_truth = sort(page_to_count);
+            checkSimilarity();
+            time_stamp+=sample_time;
+        }
 
         for (auto pe: ee.pe_list) {
             tot_accesses += pe.accesses;
@@ -189,19 +205,6 @@ void analyze_trace(bool gen_file_data,
                 page_to_count[pe.page_num] += pe.accesses;
             }
             total_truth += pe.accesses;
-//             access_counter += pe.accesses;
-
-//             if( access_counter > PEBS_FREQ) {
-//                 auto it = pebs_count.find(pe.page_num);
-// 
-//                 if( it == pebs_count.end()) {
-//                     pebs_count[pe.page_num] = 1;
-//                 } else {
-//                     it->second++;
-//                 }
-                
-
-//                 access_counter -= PEBS_FREQ;
         }
 
         int num_samples = (access_counter + tot_accesses) / PEBS_FREQ;
@@ -240,29 +243,23 @@ void analyze_trace(bool gen_file_data,
         }
     }
 
-    sorted_pebs = sort(pebs_count);
 
-    for( auto it: sorted_pebs) {
-        total_pebs += it.second;
-    }
-    sorted_truth = sort(page_to_count);
-
-   if(gen_file_data)  {
-       for(auto it: sorted_pebs) {
-           fptr.write((char*)&it, sizeof(it));
-       }
-
-       std::pair<uint64_t, uint64_t> sep;
-       sep.first = 0;
-       sep.second = 0;
-
-       fptr.write((char*)&sep, sizeof(sep));
-
-       for(auto it: sorted_truth) {
-           fptr.write((char*)&it, sizeof(it));
-       }
-
-    }
+//    if(gen_file_data)  {
+//        for(auto it: sorted_pebs) {
+//            fptr.write((char*)&it, sizeof(it));
+//        }
+// 
+//        std::pair<uint64_t, uint64_t> sep;
+//        sep.first = 0;
+//        sep.second = 0;
+// 
+//        fptr.write((char*)&sep, sizeof(sep));
+// 
+//        for(auto it: sorted_truth) {
+//            fptr.write((char*)&it, sizeof(it));
+//        }
+// 
+//     }
 
     std::cerr << std::endl;
 }
@@ -317,7 +314,7 @@ int main(int argc, char* argv[]) {
 
     fptr.close();
 
-    checkSimilarity();
+//     checkSimilarity();
 
 }
 
