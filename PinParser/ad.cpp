@@ -202,7 +202,7 @@ void analyze_trace(bool gen_file_data, int num_bits, float sample_time,
 //                 fprintf(stderr, "%ld %ld \n", it.first, it.second);
 //             }
 // 
-            fprintf(stdout, "bit number: %d, time: %f\n",num_bits, ee.eh.time);
+            fprintf(stdout, "bit number: %d time: %f\n",num_bits, ee.eh.time);
             checkSimilarity(num_bits);
 
             last_analyze_time += sample_time*num_bits;
