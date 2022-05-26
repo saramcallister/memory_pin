@@ -1,9 +1,0 @@
-percent hot pages: 0.050000
-num_bits: 10
-num_bits: 10
-bit number: 10 time: 3175.000000
-ad could identify 0.065309 of the top 5.000000% pages
-pg_count: 729 sorted_truth.size(): 223247 sorted_ad.size(): 223247
-bit number: 10 time: 6350.000000
-ad could identify 0.052587 of the top 5.000000% pages
-pg_count: 587 sorted_truth.size(): 223248 sorted_ad.size(): 223248

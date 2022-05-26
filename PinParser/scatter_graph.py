@@ -9,46 +9,37 @@ import argparse
 from num2words import num2words
 
 parser = argparse.ArgumentParser()
-parser.add_argument('input_files', type=str, nargs=10)
+parser.add_argument('input_files', type=str, nargs="+")
 parser.add_argument('file_name', type=str, default="")
 # parser.add_argument('input_file', type=str, default="")
 
 args = parser.parse_args()
 
-# def graph(graph_input, label):
-def graph(data, times,graph_name):
+def scatter(data, times,graph_name, rows, cols):
 
-    fig, ax = plt.subplots(nrows=2, ncols=5)
+    fig, ax = plt.subplots(nrows=rows, ncols=cols)
     plt.ylabel("fraction accuracy")
     plt.xlabel("Time")
 
     cmap = plt.get_cmap('tab20')
     colors = [cmap(2*i) for i in range(10)]
 
-#     for i in range(5):
-#         ax[0].plot(times[i], data[i], color=colors[i], label=num2words(i+1))
-#     ax[0].legend(loc="upper left")
-#     for i in range(5):
-#         ax[1].plot(times[i+5], data[i+5], color=colors[i+5], label=num2words(i+6))
-#     ax[1].legend(loc="upper left")
-    for i in range(2):
-        for j in range(5):
-            ax[i,j].scatter(times[(i*5)+j], data[(i*5)+j],
-            color=colors[(i*5)+j], label=num2words((i*5)+j+1))
+    for i in range(rows):
+        for j in range(cols):
+            ax[i,j].scatter(times[(i*cols)+j], data[(i*cols)+j],
+            color=colors[(i*cols)+j], label=num2words((i*cols)+j+1))
             ax[i,j].legend(loc="upper left")
-#     plt.legend(loc="upper left")
+            ax[i,j].set_ylabel("fraction accuracy")
+            ax[i,j].set_xlabel("Time")
 
     fig.set_size_inches(18.5, 10.5)
 
-#     plt.savefig("graph_all_in_one") 
     plt.savefig(graph_name) 
-
-
 
 def main(): 
     
-    data = [[] for i in range(10)]
-    times = [[] for i in range(10)]
+    data = [[] for i in range(len(args.input_files))]
+    times = [[] for i in range(len(args.input_files))]
 
 
 #     print(args)
@@ -65,7 +56,8 @@ def main():
                 data[index].append(float(next_line[3]))
                 times[index].append(float(line[4]))
 
-    graph(data,times, args.file_name)
+    scatter(data,times, args.file_name, 2, int(len(args.input_files)/2))
+
 
 
 main()

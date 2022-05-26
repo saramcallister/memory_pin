@@ -97,6 +97,7 @@ void compare() {
 void checkSimilarity() {
 
     std::unordered_set<uint64_t> page_set;
+    std::unordered_set<uint64_t> top_pebs_pages;
     uint64_t pg_count = 0;
     uint64_t count = 0;
 
@@ -117,22 +118,48 @@ void checkSimilarity() {
     count = 0;
     limit = sorted_pebs.size()*percent_hot_pages;
 
+//     for( auto i : sorted_pebs) {
+// 
+//        if(count < limit) {
+//            if(page_set.find(i.first) != page_set.end()) {
+//              pg_count++;
+//            }
+//            count++;
+//        }
+//        else {
+//            break;
+//        }
+// 
+//     }
+    uint64_t curr_count = -1;
+//     fprintf(stdout, "%lu\n", curr_count);
     for( auto i : sorted_pebs) {
+        if(i.second < curr_count) {
+            if(count >= limit) {
+                break;      // we have already added enough pages
+            } else {
+                curr_count = i.second;
+            }
+        }
 
-       if(count < limit) {
-           if(page_set.find(i.first) != page_set.end()) {
-             pg_count++;
-           }
-           count++;
-       }
-       else {
-           break;
-       }
+        if(i.second > curr_count) {
+            fprintf(stderr, "THIS SHOULDN'T BE REACHED\n");
+            exit(-1);
+        }
+        count ++;
+
+        top_pebs_pages.insert(i.first);
 
     }
 
+    for(auto i: top_pebs_pages) {
+        if(page_set.find(i) != page_set.end()) {
+            pg_count++;
+        }
+    }
+
     fprintf(stdout, "pebs could identify %f of the top %f%% pages\n",
-    ((float) pg_count/limit), percent_hot_pages*100);
+    ((float) pg_count/(sorted_truth.size()*percent_hot_pages)), percent_hot_pages*100);
     fprintf(stdout, 
         "pg_count: %ld, sorted_truth.size(): %ld, sorted_pebs.size(): %ld\n", 
             pg_count, sorted_truth.size(), sorted_pebs.size());
@@ -154,7 +181,7 @@ std::vector<std::pair<uint64_t, uint64_t>> sort (
 
 TraceFile trace;
 
-void analyze_trace(bool gen_file_data, 
+void analyze_trace(bool gen_file_data, float sample_time,
                     int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
     std::unordered_map<uint64_t, uint64_t> page_to_count;
     std::unordered_map<uint64_t, uint64_t> pebs_count;
@@ -165,7 +192,6 @@ void analyze_trace(bool gen_file_data,
     bool first = true;
     uint64_t access_counter=0;
     double time_stamp;
-    float sample_time = PEBS_PERIOD * 63.5; //TODO: make general
 
     while (instr_limit > seen_instr - start_instr) {
         num_reads ++;
@@ -184,17 +210,6 @@ void analyze_trace(bool gen_file_data,
 
         seen_instr += ee.eh.instructions;
 
-        if((ee.eh.time - time_stamp) >= sample_time) {
-            sorted_pebs = sort(pebs_count);
-
-            for( auto it: sorted_pebs) {
-                total_pebs += it.second;
-            }
-            fprintf(stdout, "time: %f\n", ee.eh.time);
-            sorted_truth = sort(page_to_count);
-            checkSimilarity();
-            time_stamp+=sample_time;
-        }
 
         for (auto pe: ee.pe_list) {
             tot_accesses += pe.accesses;
@@ -238,81 +253,54 @@ void analyze_trace(bool gen_file_data,
         access_counter += tot_accesses;
         access_counter = access_counter % PEBS_FREQ;
 
+        if((ee.eh.time - time_stamp) >= sample_time) {
+            sorted_pebs = sort(pebs_count);
+
+            for( auto it: sorted_pebs) {
+                total_pebs += it.second;
+            }
+            fprintf(stdout, "time: %f\n", ee.eh.time);
+            sorted_truth = sort(page_to_count);
+            checkSimilarity();
+            time_stamp+=sample_time;
+
+            pebs_count.clear();
+            sorted_truth.clear();
+
+            page_to_count.clear();
+            sorted_pebs.clear();
+
+        }
+
         if (num_reads % 1001 == 1000) {
             std::cerr << '.';
         }
     }
-
-
-//    if(gen_file_data)  {
-//        for(auto it: sorted_pebs) {
-//            fptr.write((char*)&it, sizeof(it));
-//        }
-// 
-//        std::pair<uint64_t, uint64_t> sep;
-//        sep.first = 0;
-//        sep.second = 0;
-// 
-//        fptr.write((char*)&sep, sizeof(sep));
-// 
-//        for(auto it: sorted_truth) {
-//            fptr.write((char*)&it, sizeof(it));
-//        }
-// 
-//     }
 
     std::cerr << std::endl;
 }
 
 int main(int argc, char* argv[]) {
 
-    if (argc < 3) {
-        std::cerr << "./pebs tracefile percent_hot_pages [ [-g] sorted_trace_file]" << std::endl;
+    if(argc < 5) {
+        std::cerr << "./pebs tracefile percent_hot_pages time_scale sample_time" << std::endl;
         return 1;
     }
-    bool use_file_data = false;
-    bool gen_file_data = false;
-    float percent_input = std::stoi(argv[PERCENT_HOT_INDEX]);
+
+    trace.setTraceFile(argv[1]);
+
+    float percent_input = std::stoi(argv[2]);
+
+    float time_scale = std::stof(argv[3]);
+
+    float sample_time = std::stof(argv[4]);
 
     percent_hot_pages = percent_input/100;
+    fprintf(stdout, "percent hot pages: %f\n", percent_hot_pages);
+    fprintf(stdout, "time_scale: %f\n", time_scale);
+    fprintf(stdout, "sample_time: %f\n", sample_time);
 
-    
-
-    if( argc >= ARGV_SORTED_FILE_LEN ) {
-        if( strcmp(argv[GEN_FLAG_INDEX], "-g") == 0) {
-            if(argc > MAX_ARGV_LEN) {
-                std::cerr << "./pebs tracefile percent_hot_pages [ [-g] sorted_trace_file]" << std::endl;
-                return 1;
-            } else {
-                errno = 0;
-                fptr.open(argv[GEN_FILE_WRITE_INDEX], std::fstream::in | std::fstream::out | std::fstream::trunc | std::ios::in | std::ios::out | std::ios::binary);
-
-                if(errno) {
-                    std::cerr << "Error: " << strerror(errno) << " line 282" << std::endl;
-                }
-                gen_file_data = true;
-            }
-        } else {
-            errno = 0;
-            fptr.open(argv[GEN_FILE_READ_INDEX], std::ios::in | std::ios::out | std::ios::binary);
-
-            if(errno) {
-                std::cerr << "Error: " << strerror(errno) << " line 288" << std::endl;
-            }
-            
-            use_file_data = true;
-        }
-    }
-
-    trace.setTraceFile(argv[TRACEFILE_INDEX]);
-
-    if(use_file_data) {
-        read_from_sorted();
-    } else {
-        analyze_trace(gen_file_data);
-    }
-
-    fptr.close();
+    analyze_trace(false,  time_scale*sample_time);
 
 //     checkSimilarity();
 
