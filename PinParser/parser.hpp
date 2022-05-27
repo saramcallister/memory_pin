@@ -44,6 +44,8 @@ class TraceFile {
             }
         };
         EntireEntry readNextEntry();
+        int writeEntry(EntireEntry ee);
+        void setTraceFile(const char* filename, bool ro); // can cause program to exit
         void setTraceFile(const char* filename); // can cause program to exit
 
     private:

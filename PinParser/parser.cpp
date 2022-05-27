@@ -2,6 +2,7 @@
 #include <cstring>
 #include <clocale>
 #include <iostream>
+#include <string>
 
 #include "parser.hpp"
 
@@ -32,11 +33,36 @@ EntireEntry TraceFile::readNextEntry() {
     return ee;
 }
 
-void TraceFile::setTraceFile(const char* filename) {
-    trace = fopen(filename, "r");
+int TraceFile::writeEntry(EntireEntry ee) {
+    size_t ret = fwrite(&ee.eh, sizeof(ee.eh), 1, trace);
+    if (ret != 1) {
+        fprintf(stderr, "%d %s\n", ret, strerror(errno));
+        return -1;
+    }
+
+    for(auto pe: ee.pe_list) {
+        ret = fwrite(&pe, sizeof(pe), 1, trace);
+//         fprintf(stdout, "%lu, %lu\n", pe.page_num, pe.accesses);
+        if (ret != 1) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+void TraceFile::setTraceFile(const char* filename, bool ro) {
+    if(ro) {
+        trace = fopen(filename, "r");
+    } else {
+        trace = fopen(filename, "w");
+    }
     if (trace == NULL) {
         std::cerr << "Failed to open trace file (" << filename << ") for reading"
             << " with error: " << std::strerror(errno) << std::endl;
         exit(1);
     }
+}
+
+void TraceFile::setTraceFile(const char* filename) {
+    setTraceFile(filename, true);
 }

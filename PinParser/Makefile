@@ -13,13 +13,17 @@ all: lfu \
 	compare \
 	pagemap_read \
     pebs \
-    ad
+    ad \
+    pebs_gen
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
 
 pebs: parser.o pebs.o 
 	$(CXX) -o pebs pebs.o parser.o
+
+pebs_gen: parser.o pebs_gen.o 
+	$(CXX) -o pebs_gen pebs_gen.o parser.o
 
 ad: parser.o ad.o 
 	$(CXX) -o ad ad.o parser.o
@@ -57,6 +61,8 @@ pagemap_read: pagemap_read.o
 lfu.o: lfu.cpp parser.hpp
 
 pebs.o: pebs.cpp parser.hpp
+
+pebs_gen.o: pebs_gen.cpp parser.hpp
 
 ad.o: ad.cpp parser.hpp
 
