@@ -31,6 +31,7 @@ def scatter(data, times,graph_name, rows, cols):
             ax[i,j].legend(loc="upper left")
             ax[i,j].set_ylabel("fraction accuracy")
             ax[i,j].set_xlabel("Time")
+            ax[i,j].set_ylim(0,1)
 
     fig.set_size_inches(18.5, 10.5)
 

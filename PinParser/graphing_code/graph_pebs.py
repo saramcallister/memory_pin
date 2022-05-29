@@ -24,7 +24,9 @@ def graph(data, times,graph_name):
     colors = [cmap(2*i) for i in range(10)]
 
     ax[0].plot(times, data)
+    ax[0].set_ylim(0,1)
     ax[1].scatter(times,data)
+    ax[1].set_ylim(0,1)
 
     fig.set_size_inches(18.5, 10.5)
 
