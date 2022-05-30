@@ -15,6 +15,49 @@
 TraceFile pin_trace;
 TraceFile hotness_trace;
 
+std::unordered_map<uint64_t, uint64_t>  sorted_pin;
+std::unordered_map<uint64_t, uint64_t> sorted_hotness;
+
+bool cmp ( std::pair <uint64_t, uint64_t> a, std::pair <uint64_t, uint64_t> b) {
+    return a.second < b.second;
+}
+
+std::vector<uint64_t> get_top_pages (std::priority_queue <PageEntry,
+std::vector<PageEntry>, PageEntryComparator> pq, uint64_t num_pages) {
+
+    uint64_t count = 0;
+    uint64_t curr_count = std::numeric_limits<uint64_t>::max();
+
+    std::vector<uint64_t> top_pages;
+
+    while(pq.empty() == false) {
+        PageEntry pe = pq.top();
+        if(pe.accesses < curr_count) {
+            if(count >= num_pages) {
+                break; 
+            } else {
+                curr_count = pe.accesses;
+//                 fprintf(stderr, "curr count updated: %lu\n", curr_count);
+            }
+        }
+
+        if( pe.accesses > curr_count) {
+            fprintf(stderr, "THIS SHOULD NEVER BE REACHED sorted %lu, %lu\n",
+            pe.accesses, curr_count);
+            exit(-1);
+        }
+
+        count++;
+        top_pages.push_back(pe.page_num);
+        pq.pop();
+    }
+//     }
+
+    fprintf(stdout, "added %lu pages, limit %lu\n", count, num_pages);
+
+    return top_pages;
+}
+
 
 std::unordered_map<uint64_t, uint64_t> aggregatePages(TraceFile &trace, int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
     std::unordered_map<uint64_t, uint64_t> page_to_count;
@@ -57,17 +100,28 @@ void getPopularPages(std::unordered_map<uint64_t, uint64_t> pin_pages,
 
     std::priority_queue <PageEntry, std::vector<PageEntry>, PageEntryComparator>
     pq_pin;
+    std::priority_queue <PageEntry, std::vector<PageEntry>, PageEntryComparator>
+    pq_hotness;
+
+// //     printf("building pin_pages\n");
     for (auto & [ page_num, accesses ] : pin_pages) {
         pq_pin.push(PageEntry(page_num, accesses));
     }
+//     printf("building hotness pages\n");
+    for (auto & [ page_num, accesses ] : hotness_pages) {
+        pq_hotness.push(PageEntry(page_num, accesses));
+    }
+
+    auto top_pages = get_top_pages(pq_hotness, total_pages);
 
     uint64_t misses = 0;
     uint64_t hits = 0;
     uint64_t pages_taken = 0;
     while (pq_pin.empty() == false) {
         PageEntry pe = pq_pin.top();
-        if (pages_taken < total_pages && (hotness_pages.find(pe.page_num) !=
-            hotness_pages.end()) ) {    // hit if we have enough pages and the
+        if (pages_taken < total_pages && (std::find(top_pages.begin(),
+            top_pages.end(),pe.page_num) !=
+            top_pages.end()) ) {    // hit if we have enough pages and the
                                     //page is hot according to hotness mechanism
             hits += pe.accesses;
         } else {
@@ -86,7 +140,7 @@ void getPopularPages(std::unordered_map<uint64_t, uint64_t> pin_pages,
 int main(int argc, char* argv[]) {
 
 
-    if (argc < 3) {
+    if (argc < 4) {
         std::cerr << "./lfu ground_truth_trace input_trace numpages..numpages" << std::endl;
         return 1;
     }
@@ -100,9 +154,10 @@ int main(int argc, char* argv[]) {
     int arg_num = 3;
     while (arg_num < argc) {
         uint64_t page_limit = atoi(argv[arg_num]);
-        fprintf(stdout, "Page Limit: %ld ---- ", page_limit);
+        fprintf(stdout, "Page Limit: %ld ---- \n", page_limit);
         getPopularPages(pin_mapping, hotness_mapping, page_limit);
         arg_num++;
     }
+
 }
 

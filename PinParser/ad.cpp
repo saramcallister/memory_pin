@@ -82,16 +82,6 @@ void checkSimilarity(int num_bits) {
 
         top_ad_pages.insert(i.first);
 
-//        if(count < limit) {
-//            if(page_set.find(i.first) != page_set.end()) {
-//              pg_count++;
-//            }
-//            count++;
-//        }
-//        else {
-//            break;
-//        }
-
     }
 
     for(auto i: top_ad_pages) {
