@@ -63,7 +63,9 @@ void outputHitsMisses(uint64_t total_pages, std::vector<uint64_t> ordered_access
         }
         pages_seen++;
     }
-    fprintf(outfile, "%ld %ld %ld\n", total_pages, hits, misses);
+    fprintf(outfile, 
+        "limit: %ld hits: %ld misses: %ld miss ratio: %f\n", total_pages, hits, misses,
+        (double)(misses)/(double)(hits+misses));
 }
 
 int main(int argc, char* argv[]) {

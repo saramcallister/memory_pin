@@ -15,7 +15,9 @@ all: lfu \
     pebs \
     ad \
     pebs_gen \
-    lfu_pebs
+    lfu_pebs \
+    random_pebs \
+    first_seen_pebs
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
@@ -38,8 +40,14 @@ goanna0: parser.o goanna0.o
 first_seen: parser.o first_seen.o 
 	$(CXX) -o first_seen first_seen.o parser.o
 
+first_seen_pebs: parser.o first_seen_pebs.o 
+	$(CXX) -o first_seen_pebs first_seen_pebs.o parser.o
+
 random: parser.o random.o 
 	$(CXX) -o random random.o parser.o
+
+random_pebs: parser.o random_pebs.o 
+	$(CXX) -o random_pebs random_pebs.o parser.o
 
 hfa: parser.o hotness_vs_first_access.o
 	$(CXX) -o hfa hotness_vs_first_access.o parser.o
@@ -76,7 +84,11 @@ goanna0.o: goanna0.cpp parser.hpp
 
 first_seen.o: first_seen.cpp parser.hpp
 
+first_seen_pebs.o: first_seen_pebs.cpp parser.hpp
+
 random.o: random.cpp parser.hpp
+
+random_pebs.o: random_pebs.cpp parser.hpp
 
 dynamic_lfu.o: dynamic_lfu.cpp parser.hpp
 
