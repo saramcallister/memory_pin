@@ -3,6 +3,8 @@ CXXFLAGS=-g -Wall -std=c++17
 
 all: lfu \
 	dynamic_lfu \
+	dynamic_lfu_random \
+	dynamic_lfu_fifo \
 	working_set_size \
 	hfa \
 	first_seen \
@@ -18,7 +20,9 @@ all: lfu \
     lfu_pebs \
     random_pebs \
     first_seen_pebs \
-    dynamic_lfu_pebs 
+    dynamic_lfu_pebs \
+    dynamic_lfu_fifo_pebs \
+    dynamic_lfu_random_pebs 
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
@@ -56,8 +60,20 @@ hfa: parser.o hotness_vs_first_access.o
 dynamic_lfu: parser.o dynamic_lfu.o 
 	$(CXX) -o dynamic_lfu dynamic_lfu.o parser.o
 
+dynamic_lfu_random: parser.o dynamic_lfu_random.o 
+	$(CXX) -o dynamic_lfu_random dynamic_lfu_random.o parser.o
+
+dynamic_lfu_fifo: parser.o dynamic_lfu_fifo.o 
+	$(CXX) -o dynamic_lfu_fifo dynamic_lfu_fifo.o parser.o
+
 dynamic_lfu_pebs: parser.o dynamic_lfu_pebs.o 
 	$(CXX) -o dynamic_lfu_pebs dynamic_lfu_pebs.o parser.o
+
+dynamic_lfu_random_pebs: parser.o dynamic_lfu_random_pebs.o 
+	$(CXX) -o dynamic_lfu_random_pebs dynamic_lfu_random_pebs.o parser.o
+
+dynamic_lfu_fifo_pebs: parser.o dynamic_lfu_fifo_pebs.o 
+	$(CXX) -o dynamic_lfu_fifo_pebs dynamic_lfu_fifo_pebs.o parser.o
 
 working_set_size: parser.o working_set_size.o
 	$(CXX) -o working_set_size working_set_size.o parser.o
@@ -96,7 +112,15 @@ random_pebs.o: random_pebs.cpp parser.hpp
 
 dynamic_lfu.o: dynamic_lfu.cpp parser.hpp
 
+dynamic_lfu_random.o: dynamic_lfu_random.cpp parser.hpp
+
+dynamic_lfu_fifo.o: dynamic_lfu_fifo.cpp parser.hpp
+
 dynamic_lfu_pebs.o: dynamic_lfu_pebs.cpp parser.hpp
+
+dynamic_lfu_random_pebs.o: dynamic_lfu_random_pebs.cpp parser.hpp
+
+dynamic_lfu_fifo_pebs.o: dynamic_lfu_fifo_pebs.cpp parser.hpp
 
 working_set_size.o: working_set_size.cpp parser.hpp
 

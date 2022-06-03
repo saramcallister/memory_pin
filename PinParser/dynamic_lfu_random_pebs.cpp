@@ -213,7 +213,7 @@ int main(int argc, char* argv[]) {
         uint64_t page_limit = atoi(argv[arg_num]);
 //         std::vector<uint64_t> starting_pages = getStartingPages(initial_mapping, page_limit);
         std::vector<uint64_t> starting_pages =
-        getStartingLFU(initial_mapping, page_limit);
+        getStartingRandom(initial_mapping, page_limit);
         for (const auto timing : page_mvmt_speeds) {
 //             trace = TraceFile();
 //             trace.setTraceFile(argv[1]); // reset to run through again
