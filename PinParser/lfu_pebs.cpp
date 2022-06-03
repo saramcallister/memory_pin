@@ -37,7 +37,6 @@ std::vector<PageEntry>, PageEntryComparator> pq, uint64_t num_pages) {
                 break; 
             } else {
                 curr_count = pe.accesses;
-//                 fprintf(stderr, "curr count updated: %lu\n", curr_count);
             }
         }
 
@@ -51,7 +50,6 @@ std::vector<PageEntry>, PageEntryComparator> pq, uint64_t num_pages) {
         top_pages.push_back(pe.page_num);
         pq.pop();
     }
-//     }
 
     fprintf(stdout, "added %lu pages, limit %lu\n", count, num_pages);
 
@@ -103,11 +101,9 @@ void getPopularPages(std::unordered_map<uint64_t, uint64_t> pin_pages,
     std::priority_queue <PageEntry, std::vector<PageEntry>, PageEntryComparator>
     pq_hotness;
 
-// //     printf("building pin_pages\n");
     for (auto & [ page_num, accesses ] : pin_pages) {
         pq_pin.push(PageEntry(page_num, accesses));
     }
-//     printf("building hotness pages\n");
     for (auto & [ page_num, accesses ] : hotness_pages) {
         pq_hotness.push(PageEntry(page_num, accesses));
     }

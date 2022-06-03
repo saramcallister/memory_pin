@@ -17,7 +17,8 @@ all: lfu \
     pebs_gen \
     lfu_pebs \
     random_pebs \
-    first_seen_pebs
+    first_seen_pebs \
+    dynamic_lfu_pebs 
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
@@ -55,6 +56,9 @@ hfa: parser.o hotness_vs_first_access.o
 dynamic_lfu: parser.o dynamic_lfu.o 
 	$(CXX) -o dynamic_lfu dynamic_lfu.o parser.o
 
+dynamic_lfu_pebs: parser.o dynamic_lfu_pebs.o 
+	$(CXX) -o dynamic_lfu_pebs dynamic_lfu_pebs.o parser.o
+
 working_set_size: parser.o working_set_size.o
 	$(CXX) -o working_set_size working_set_size.o parser.o
 
@@ -91,6 +95,8 @@ random.o: random.cpp parser.hpp
 random_pebs.o: random_pebs.cpp parser.hpp
 
 dynamic_lfu.o: dynamic_lfu.cpp parser.hpp
+
+dynamic_lfu_pebs.o: dynamic_lfu_pebs.cpp parser.hpp
 
 working_set_size.o: working_set_size.cpp parser.hpp
 

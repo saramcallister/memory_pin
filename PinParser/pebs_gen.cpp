@@ -30,7 +30,6 @@ void analyze_trace(int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
     int64_t start_instr = 0;
     bool first = true;
     uint64_t access_counter=0;
-//     double time_stamp;
 
     while (instr_limit > seen_instr - start_instr) {
         num_reads ++;
@@ -47,7 +46,6 @@ void analyze_trace(int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
         if (first) {
             start_instr = ee.eh.instructions;
             first = false;
-//             time_stamp = ee.eh.time;
         }
 
         seen_instr += ee.eh.instructions;
@@ -62,7 +60,6 @@ void analyze_trace(int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
             } else {
                 page_to_count[pe.page_num] += pe.accesses;
             }
-//             total_truth += pe.accesses;
         }
 
         int num_samples = (access_counter + tot_accesses) / PEBS_FREQ;
@@ -96,13 +93,9 @@ void analyze_trace(int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
         for( auto it: pebs_count) {
             PageEntry pe(it.first, it.second);
             write_ee.pe_list.push_back(pe);
-//             fprintf(stdout, "%lu, %lu\n", it.first, it.second);
         }
-//         fprintf(stdout, "%lu\n", write_ee.pe_list.size());
 
         write_ee.eh.num_pages = pebs_count.size();
-
-//         fprintf(stdout, "%lu, %lu\n", write_ee.eh.num_pages, ee.eh.num_pages);
 
         write_trace.writeEntry(write_ee);
 
@@ -111,25 +104,6 @@ void analyze_trace(int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
 
         access_counter += tot_accesses;
         access_counter = access_counter % PEBS_FREQ;
-
-//         if((ee.eh.time - time_stamp) >= sample_time) {
-//             sorted_pebs = sort(pebs_count);
-// 
-//             for( auto it: sorted_pebs) {
-//                 total_pebs += it.second;
-//             }
-//             fprintf(stdout, "time: %f\n", ee.eh.time);
-//             sorted_truth = sort(page_to_count);
-//             checkSimilarity();
-//             time_stamp+=sample_time;
-// 
-//             pebs_count.clear();
-//             sorted_truth.clear();
-// 
-//             page_to_count.clear();
-//             sorted_pebs.clear();
-// 
-//         }
 
         if (num_reads % 1001 == 1000) {
             std::cerr << '.';
