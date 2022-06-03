@@ -62,35 +62,6 @@ std::vector<PageEntry> traceToMap(TraceFile &trace, int64_t instr_limit = std::n
 }
 
 
-std::vector<uint64_t> getStartingFIFO(std::vector<PageEntry> map, uint64_t total_pages) {
-    std::vector<uint64_t> pages;
-    for(auto pe:map) {
-        if(pages.size() >= total_pages) {
-            break;
-        }
-        pages.push_back(pe.page_num);
-    }
-
-    return pages;
-}
-
-std::vector<uint64_t> getStartingRandom(std::vector<PageEntry> map, uint64_t total_pages) {
-    std::vector<uint64_t> pages;
-
-   std::unordered_set<uint64_t> added_indices; 
-
-   while(pages.size() < total_pages) {
-       uint64_t index = fastrand() % total_pages;
-       auto it = added_indices.find(index);
-       if(it == added_indices.end()) {
-           pages.push_back(map[index].page_num);
-       }
-   }
-
-   return pages;
-    
-}
-
 std::vector<uint64_t> getStartingLFU(std::vector<PageEntry> map, uint64_t total_pages) {
     std::unordered_map<uint64_t, uint64_t> initial;
 

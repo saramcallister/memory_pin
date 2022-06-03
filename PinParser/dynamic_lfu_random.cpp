@@ -17,6 +17,12 @@
 TraceFile trace;
 FILE* outfile;
 
+static unsigned int gseed=123456789;
+inline int fastrand() {
+    gseed = (214013 * gseed + 2531011);
+    return (gseed >> 16) & 0x7fff;
+}
+
 // std::unordered_map<uint64_t, uint64_t> aggregatePages(int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
 std::vector<PageEntry> aggregatePages(int64_t instr_limit =
 std::numeric_limits<int64_t>::max()) {
@@ -39,12 +45,6 @@ std::numeric_limits<int64_t>::max()) {
         seen_instr += ee.eh.instructions;
 
         for (auto pe: ee.pe_list) {
-//             auto it = page_to_count.find(pe.page_num);
-//             if (it == page_to_count.end()) {
-//                 page_to_count[pe.page_num] = std::min<uint64_t>(pe.accesses, 64);
-//             } else {
-//                 it->second += std::min<uint64_t>(pe.accesses, 64);
-//             }
             page_to_count.push_back(pe);
         }
         if (num_reads % 10001 == 10000) {
@@ -56,26 +56,19 @@ std::numeric_limits<int64_t>::max()) {
 }
 
 
-// std::vector<uint64_t> getStartingPages(std::unordered_map<uint64_t, uint64_t> initial, uint64_t total_pages) {
 std::vector<uint64_t> getStartingPages(std::vector<PageEntry> initial, uint64_t total_pages) {
-//     std::priority_queue <PageEntry, std::vector<PageEntry>, PageEntryComparator> pq;
-//     for (auto & [ page_num, accesses ] : initial) {
-//         pq.push(PageEntry(page_num, accesses));
-//     }
-// 
     std::vector<uint64_t> pages;
-//     pages.reserve(total_pages);
-//     for (uint64_t i = 0; i < total_pages; i++) {
-//         PageEntry pe = pq.top();
-//         pages.push_back(pe.page_num);
-//         pq.pop();
-//     }
-    for(auto pe: initial) {
-        if(pages.size() >= total_pages) {
-            pages.push_back(pe.page_num);
-        }
-    }
-    return pages;
+   std::unordered_set<uint64_t> added_indices; 
+
+   while(pages.size() < total_pages) {
+       uint64_t index = fastrand() % total_pages;
+       auto it = added_indices.find(index);
+       if(it == added_indices.end()) {
+           pages.push_back(initial[index].page_num);
+       }
+   }
+
+   return pages;
 }
 
 void dynamicLFU(std::vector<uint64_t> starting_pages, uint64_t total_pages, int timing) {

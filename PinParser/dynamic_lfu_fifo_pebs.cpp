@@ -74,50 +74,6 @@ std::vector<uint64_t> getStartingFIFO(std::vector<PageEntry> map, uint64_t total
     return pages;
 }
 
-std::vector<uint64_t> getStartingRandom(std::vector<PageEntry> map, uint64_t total_pages) {
-    std::vector<uint64_t> pages;
-
-   std::unordered_set<uint64_t> added_indices; 
-
-   while(pages.size() < total_pages) {
-       uint64_t index = fastrand() % total_pages;
-       auto it = added_indices.find(index);
-       if(it == added_indices.end()) {
-           pages.push_back(map[index].page_num);
-       }
-   }
-
-   return pages;
-    
-}
-
-std::vector<uint64_t> getStartingLFU(std::vector<PageEntry> map, uint64_t total_pages) {
-    std::unordered_map<uint64_t, uint64_t> initial;
-
-    for(auto pe: map) {
-        auto it = initial.find(pe.page_num);
-        if (it == initial.end()) {
-            initial[pe.page_num] = std::min<uint64_t>(pe.accesses, 64);
-        } else {
-            it->second += std::min<uint64_t>(pe.accesses, 64);
-        }
-    }
-
-    std::priority_queue <PageEntry, std::vector<PageEntry>, PageEntryComparator> pq;
-    for (auto & [ page_num, accesses ] : initial) {
-        pq.push(PageEntry(page_num, accesses));
-    }
-
-    std::vector<uint64_t> pages;
-    pages.reserve(total_pages);
-    for (uint64_t i = 0; i < total_pages; i++) {
-        PageEntry pe = pq.top();
-        pages.push_back(pe.page_num);
-        pq.pop();
-    }
-    return pages;
-}
-
 void dynamicLFU(std::vector<uint64_t> starting_pages, uint64_t total_pages, int timing) {
     EntireEntry pin_ee = pinTrace.readNextEntry();
     EntireEntry hotness_ee = hotnessTrace.readNextEntry();
