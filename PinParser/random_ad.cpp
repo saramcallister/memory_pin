@@ -20,8 +20,8 @@
 // #define PIN_TIME_SCALE 30 // TODO: make this tunable - per workload? currently
                           // only for 505
 // #define PIN_TIME_SCALE 63.5
-// #define MAX_BITS 1 // TODO: made tunable 
-// #define MAX_SAMPLE_TIME (SAMPLE_TIME_IN_S * PIN_TIME_SCALE * MAX_BITS)
+#define MAX_BITS 1 // TODO: made tunable 
+#define MAX_SAMPLE_TIME (SAMPLE_TIME_IN_S * PIN_TIME_SCALE * MAX_BITS)
 
 std::vector<std::pair<uint64_t, uint64_t>> sorted_ad;
 std::vector<std::pair<uint64_t, uint64_t>> sorted_truth;
@@ -117,6 +117,8 @@ void analyze_trace(bool gen_file_data, int num_bits, float sample_time,
                     int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
     std::unordered_map<uint64_t, uint64_t> page_to_count;
     std::unordered_map<uint64_t, uint64_t> page_to_ad_bits;
+
+    std::unordered_set<uint64_t> current_pages; 
 //     std::unordered_set<uint64_t> accessed_pages;
     std::unordered_map<uint64_t, uint64_t> accessed_pages;
 

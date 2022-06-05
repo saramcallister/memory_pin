@@ -16,16 +16,21 @@ all: lfu \
 	pagemap_read \
     pebs \
     ad \
+    ad_gen \
     pebs_gen \
     lfu_pebs \
     random_pebs \
     first_seen_pebs \
     dynamic_lfu_pebs \
     dynamic_lfu_fifo_pebs \
-    dynamic_lfu_random_pebs 
+    dynamic_lfu_random_pebs \
+    count_pages 
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
+
+count_pages: parser.o count_pages.o 
+	$(CXX) -o count_pages count_pages.o parser.o
 
 lfu_pebs: parser.o lfu_pebs.o 
 	$(CXX) -o lfu_pebs lfu_pebs.o parser.o
@@ -38,6 +43,9 @@ pebs_gen: parser.o pebs_gen.o
 
 ad: parser.o ad.o 
 	$(CXX) -o ad ad.o parser.o
+
+ad_gen: parser.o ad_gen.o 
+	$(CXX) -o ad_gen ad_gen.o parser.o
 
 goanna0: parser.o goanna0.o 
 	$(CXX) -o goanna0 goanna0.o parser.o
@@ -92,6 +100,8 @@ pagemap_read: pagemap_read.o
 
 lfu.o: lfu.cpp parser.hpp
 
+count_pages.o: count_pages.cpp parser.hpp
+
 lfu_pebs.o: lfu_pebs.cpp parser.hpp
 
 pebs.o: pebs.cpp parser.hpp
@@ -99,6 +109,8 @@ pebs.o: pebs.cpp parser.hpp
 pebs_gen.o: pebs_gen.cpp parser.hpp
 
 ad.o: ad.cpp parser.hpp
+
+ad_gen.o: ad_gen.cpp parser.hpp
 
 goanna0.o: goanna0.cpp parser.hpp
 
