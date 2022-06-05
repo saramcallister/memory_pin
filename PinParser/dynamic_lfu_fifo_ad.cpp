@@ -15,14 +15,8 @@
 #include "parser.hpp"
 
 TraceFile pinTrace;
-TraceFile hotnessTrace;
+// TraceFile hotnessTrace;
 FILE* outfile;
-
-static unsigned int gseed=123456789;
-inline int fastrand() {
-    gseed = (214013 * gseed + 2531011);
-    return (gseed >> 16) & 0x7fff;
-}
 
 std::vector<PageEntry> traceToMap(TraceFile &trace, int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
 //     std::unordered_map<uint64_t, uint64_t> page_to_count;
@@ -45,12 +39,6 @@ std::vector<PageEntry> traceToMap(TraceFile &trace, int64_t instr_limit = std::n
         seen_instr += ee.eh.instructions;
 
         for (auto pe: ee.pe_list) {
-//             auto it = page_to_count.find(pe.page_num);
-//             if (it == page_to_count.end()) {
-//                 page_to_count[pe.page_num] = std::min<uint64_t>(pe.accesses, 64);
-//             } else {
-//                 it->second += std::min<uint64_t>(pe.accesses, 64);
-//             }
             trace_map.push_back(pe);
         }
         if (num_reads % 10001 == 10000) {
@@ -61,55 +49,72 @@ std::vector<PageEntry> traceToMap(TraceFile &trace, int64_t instr_limit = std::n
     return trace_map;
 }
 
-
-std::vector<uint64_t> getStartingLFU(std::vector<PageEntry> map, uint64_t total_pages) {
-    std::unordered_map<uint64_t, uint64_t> initial;
-
-    for(auto pe: map) {
-        auto it = initial.find(pe.page_num);
-        if (it == initial.end()) {
-            initial[pe.page_num] = std::min<uint64_t>(pe.accesses, 64);
-        } else {
-            it->second += std::min<uint64_t>(pe.accesses, 64);
-        }
-    }
-
-    std::priority_queue <PageEntry, std::vector<PageEntry>, PageEntryComparator> pq;
-    for (auto & [ page_num, accesses ] : initial) {
-        pq.push(PageEntry(page_num, accesses));
-    }
-
+std::vector<uint64_t> getStartingFIFO(std::vector<PageEntry> map, uint64_t total_pages) {
     std::vector<uint64_t> pages;
-    pages.reserve(total_pages);
-    for (uint64_t i = 0; i < total_pages; i++) {
-        PageEntry pe = pq.top();
+    for(auto pe:map) {
+        if(pages.size() >= total_pages) {
+            break;
+        }
         pages.push_back(pe.page_num);
-        pq.pop();
     }
+
     return pages;
 }
 
-void dynamicLFU(std::vector<uint64_t> starting_pages, uint64_t total_pages, int timing) {
+void dynamicLFU(std::vector<uint64_t> starting_pages, uint64_t total_pages, int
+timing, int num_bits, uint64_t sample_time) {
     EntireEntry pin_ee = pinTrace.readNextEntry();
-    EntireEntry hotness_ee = hotnessTrace.readNextEntry();
 
     std::unordered_set<uint64_t> current_pages;
+    std::unordered_map<uint64_t, uint64_t> accessed_pages;
+    std::unordered_map<uint64_t, uint64_t> page_to_ad_bits;
+
+    uint64_t last_sample_time = pin_ee.eh.time;
+
     std::copy(starting_pages.begin(), starting_pages.end(), inserter(current_pages, current_pages.begin()));
 
     uint64_t misses = 0;
     uint64_t hits = 0;
 
     double start_time = pin_ee.eh.time * 1000; // seconds to ms
-    std::unordered_map<uint64_t, uint64_t> hits_in_current_time;
 
     while (pin_ee.valid) {
 
-        if (pin_ee.eh.time * 1000 - start_time > timing) {
+        for (auto pe: pin_ee.pe_list) {
+            if (current_pages.find(pe.page_num) == current_pages.end()) {
+                misses += pe.accesses;
+            }  else {
+                hits += pe.accesses;
+            }
+
+            auto accessed_page = accessed_pages.find(pe.page_num);
+            if (accessed_page == accessed_pages.end()) {
+                accessed_pages[pe.page_num] = 1;
+            }
+        }
+
+        if((pin_ee.eh.time - last_sample_time) >= sample_time) { // this stuff is in s
+            for (auto entry : accessed_pages) {
+                auto it = page_to_ad_bits.find(entry.first);
+
+                if(it == page_to_ad_bits.end()) {
+                    page_to_ad_bits[entry.first] = 1;
+                } else {
+                    page_to_ad_bits[entry.first]++;
+                    page_to_ad_bits[entry.first] %= (num_bits +1);
+                }
+            }
+            last_sample_time += sample_time;
+            accessed_pages.clear();
+        }
+
+        if (pin_ee.eh.time * 1000 - start_time > timing) {  // analysis time,
+                                                            // all in ms
             uint64_t least_accesses = -1;
             uint64_t victim_page;
             for (auto& page: current_pages) {
-                auto it = hits_in_current_time.find(page);
-                if (it == hits_in_current_time.end()) {
+                auto it = page_to_ad_bits.find(page);
+                if (it == page_to_ad_bits.end()) {
                     victim_page = page; 
                     break;
                 } else if (it->second < least_accesses) {
@@ -121,37 +126,21 @@ void dynamicLFU(std::vector<uint64_t> starting_pages, uint64_t total_pages, int 
 
             uint64_t most_accesses = 0;
             uint64_t promoted_page;
-            for (auto &[page, accesses]: hits_in_current_time) {
+            for (auto &[page, accesses]: page_to_ad_bits) {
                 if (accesses > most_accesses) {
                     most_accesses = accesses;
                     promoted_page = page;
                 }
             }
             current_pages.insert(promoted_page);
-            hits_in_current_time.clear();
+            page_to_ad_bits.clear();
             start_time = pin_ee.eh.time * 1000;
         
         }
 
-        for (auto pe: pin_ee.pe_list) {
-            if (current_pages.find(pe.page_num) == current_pages.end()) {
-                misses += pe.accesses;
-            }  else {
-                hits += pe.accesses;
-            }
-        }
 
-        for(auto pe: hotness_ee.pe_list) {
-            auto hit_tracking = hits_in_current_time.find(pe.page_num);
-            if (hit_tracking == hits_in_current_time.end()) {
-                hits_in_current_time[pe.page_num] = pe.accesses;
-            } else {
-                hit_tracking->second += pe.accesses;
-            }
-        }
 
         pin_ee = pinTrace.readNextEntry();
-        hotness_ee = hotnessTrace.readNextEntry();
     }
 
     fprintf(outfile, "%ld %d %ld %ld %f\n", total_pages, timing, hits, misses, 
@@ -161,39 +150,41 @@ void dynamicLFU(std::vector<uint64_t> starting_pages, uint64_t total_pages, int 
 
 int main(int argc, char* argv[]) {
 
-    if (argc < 5) {
-        std::cerr << "./lfu pin_trace hotness_trace outputfile numpages..numpages" << std::endl;
+    if (argc < 4) {
+        std::cerr << "./dynamic_lfu pin_trace outputfile num_bits sample_time numpages..numpages" << std::endl;
         return 1;
     }
 
     pinTrace.setTraceFile(argv[1]);
-    hotnessTrace.setTraceFile(argv[2]);
+//     hotnessTrace.setTraceFile(argv[2]);
 
-    auto initial_mapping = traceToMap(hotnessTrace);
+    auto initial_mapping = traceToMap(pinTrace);
 
-    outfile = fopen(argv[3], "w");
+    outfile = fopen(argv[2], "w");
     if (!outfile) {
         std::cerr << "Failed to open output file (" << argv[3] << ") for writing"
             << " with error: " << strerror(errno) << std::endl;
         exit(1);
     }
 
-    int arg_num = 4;
-    std::vector<int> page_mvmt_speeds{10, 100, 1000, 5000, 10000, 100000}; // 1 page mvmt per x ms
+    int num_bits = std::stoi(argv[3]);
+
+    int sample_time = std::stoi(argv[4]);   // in seconds
+
+    int arg_num = 5;
+//     std::vector<int> page_mvmt_speeds{10, 100, 1000, 5000, 10000, 100000}; // 1 page mvmt per x ms
+    std::vector<int> page_mvmt_speeds{1000, 5000, 10000, 50000, 100000}; // 1 page mvmt per x ms
     while (arg_num < argc) {
         uint64_t page_limit = atoi(argv[arg_num]);
-//         std::vector<uint64_t> starting_pages = getStartingPages(initial_mapping, page_limit);
         std::vector<uint64_t> starting_pages =
-        getStartingLFU(initial_mapping, page_limit);
+        getStartingFIFO(initial_mapping, page_limit);
         for (const auto timing : page_mvmt_speeds) {
-//             trace = TraceFile();
-//             trace.setTraceFile(argv[1]); // reset to run through again
             pinTrace = TraceFile();
             pinTrace.setTraceFile(argv[1]);
-            hotnessTrace = TraceFile();
-            hotnessTrace.setTraceFile(argv[2]);
+//             hotnessTrace = TraceFile();
+//             hotnessTrace.setTraceFile(argv[2]);
 
-            dynamicLFU(starting_pages, page_limit, timing);
+            dynamicLFU(starting_pages, page_limit, timing, num_bits, sample_time);
         }
         arg_num++;
     }

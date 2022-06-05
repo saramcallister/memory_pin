@@ -113,7 +113,7 @@ void outputHitsMisses(uint64_t total_pages,
 
 int main(int argc, char* argv[]) {
 
-    if (argc < 4) {
+    if (argc < 5) {
         std::cerr << "./first_seen pin_trace hotness_trace outputfile numpages..numpages" << std::endl;
         return 1;
     }

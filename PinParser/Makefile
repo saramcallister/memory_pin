@@ -24,7 +24,10 @@ all: lfu \
     dynamic_lfu_pebs \
     dynamic_lfu_fifo_pebs \
     dynamic_lfu_random_pebs \
-    count_pages 
+    count_pages \
+    dynamic_lfu_ad \
+    dynamic_lfu_random_ad \
+    dynamic_lfu_fifo_ad 
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
@@ -76,6 +79,15 @@ dynamic_lfu_fifo: parser.o dynamic_lfu_fifo.o
 
 dynamic_lfu_pebs: parser.o dynamic_lfu_pebs.o 
 	$(CXX) -o dynamic_lfu_pebs dynamic_lfu_pebs.o parser.o
+
+dynamic_lfu_ad: parser.o dynamic_lfu_ad.o 
+	$(CXX) -o dynamic_lfu_ad dynamic_lfu_ad.o parser.o
+
+dynamic_lfu_random_ad: parser.o dynamic_lfu_random_ad.o 
+	$(CXX) -o dynamic_lfu_random_ad dynamic_lfu_random_ad.o parser.o
+
+dynamic_lfu_fifo_ad: parser.o dynamic_lfu_fifo_ad.o 
+	$(CXX) -o dynamic_lfu_fifo_ad dynamic_lfu_fifo_ad.o parser.o
 
 dynamic_lfu_random_pebs: parser.o dynamic_lfu_random_pebs.o 
 	$(CXX) -o dynamic_lfu_random_pebs dynamic_lfu_random_pebs.o parser.o
@@ -129,6 +141,12 @@ dynamic_lfu_random.o: dynamic_lfu_random.cpp parser.hpp
 dynamic_lfu_fifo.o: dynamic_lfu_fifo.cpp parser.hpp
 
 dynamic_lfu_pebs.o: dynamic_lfu_pebs.cpp parser.hpp
+
+dynamic_lfu_ad.o: dynamic_lfu_ad.cpp parser.hpp
+
+dynamic_lfu_fifo_ad.o: dynamic_lfu_fifo_ad.cpp parser.hpp
+
+dynamic_lfu_random_ad.o: dynamic_lfu_random_ad.cpp parser.hpp
 
 dynamic_lfu_random_pebs.o: dynamic_lfu_random_pebs.cpp parser.hpp
 
