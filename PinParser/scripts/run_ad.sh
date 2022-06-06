@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# for i in {1..10}
-# do
-#     ./ad ../../traces/memtrace-503.out 5 $i > ad_503_5_${i} &
-# done
-
 ./ad ../../traces/memtrace-503.out 50 1 63.5 5 > ad_503_5_1 &
 ./ad ../../traces/memtrace-503.out 50 2 63.5 5 > ad_503_5_2 &
 ./ad ../../traces/memtrace-503.out 50 3 63.5 5 > ad_503_5_3 &
