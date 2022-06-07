@@ -88,7 +88,7 @@ timing, double scale) {
 //     std::unordered_map<uint64_t, uint64_t> page_to_ad_bits;
     std::unordered_map<uint64_t, HotnessEntry> hot_pages;
 
-    uint64_t last_sample_time = pin_ee.eh.time;
+//     uint64_t last_sample_time = pin_ee.eh.time;
 
     std::copy(starting_pages.begin(), starting_pages.end(), inserter(current_pages, current_pages.begin()));
 

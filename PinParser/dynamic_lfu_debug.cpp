@@ -17,28 +17,15 @@
 TraceFile trace;
 FILE* outfile;
 
-static unsigned int gseed=123456789;
-inline int fastrand() {
-    gseed = (214013 * gseed + 2531011);
-    return (gseed >> 16) & 0x7fff;
-}
-
-std::vector<uint64_t> getStartingRandom(uint64_t total_pages, 
-                    int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
-    std::vector<uint64_t> pages;
-
-   std::unordered_set<uint64_t> added_indices; 
-
-   while(added_indices.size() < total_pages) {
-       uint64_t index = fastrand() % total_pages;
-       added_indices.insert(index);
-   }
-
+std::unordered_map<uint64_t, uint64_t> aggregatePages(int64_t instr_limit = std::numeric_limits<int64_t>::max()) {
+// std::vector<PageEntry> aggregatePages(int64_t instr_limit =
+// std::numeric_limits<int64_t>::max()) {
+//     std::vector<PageEntry> page_to_count;
+    std::unordered_map<uint64_t, uint64_t> page_to_count;
     int64_t seen_instr = 0;
     int num_reads = 0;
     int64_t start_instr = 0;
     bool first = true;
-    uint64_t page_count = 0;
     while (instr_limit > seen_instr - start_instr) {
         num_reads ++;
         EntireEntry ee = trace.readNextEntry();
@@ -53,27 +40,41 @@ std::vector<uint64_t> getStartingRandom(uint64_t total_pages,
         seen_instr += ee.eh.instructions;
 
         for (auto pe: ee.pe_list) {
-            page_count++;
-            if(added_indices.find(page_count) != added_indices.end()) {
-                pages.push_back(pe.page_num);
+            auto it = page_to_count.find(pe.page_num);
+            if (it == page_to_count.end()) {
+                page_to_count[pe.page_num] = std::min<uint64_t>(pe.accesses, 64);
+            } else {
+                it->second += std::min<uint64_t>(pe.accesses, 64);
             }
+//             page_to_count.push_back(pe);
         }
         if (num_reads % 10001 == 10000) {
             fprintf(stderr, ".");
         }
     }
-
-    if(pages.size() != total_pages) {
-        fprintf(stderr, "WHOOPSIE\n");
-        exit(-1);
-    }
     std::cout << std::endl;
-   return pages;
-    
+    return page_to_count;
 }
 
-void dynamicLFU(std::vector<uint64_t> starting_pages, uint64_t total_pages,
-double timing) {
+
+std::vector<uint64_t> getStartingPages(std::unordered_map<uint64_t, uint64_t> initial, uint64_t total_pages) {
+    std::priority_queue <PageEntry, std::vector<PageEntry>, PageEntryComparator> pq;
+    for (auto & [ page_num, accesses ] : initial) {
+        pq.push(PageEntry(page_num, accesses));
+    }
+
+    std::vector<uint64_t> pages;
+    pages.reserve(total_pages);
+    for (uint64_t i = 0; i < total_pages; i++) {
+        PageEntry pe = pq.top();
+        pages.push_back(pe.page_num);
+        pq.pop();
+    }
+    return pages;
+}
+
+void dynamicLFU(std::vector<uint64_t> starting_pages, uint64_t total_pages, int
+timing, double scale) {
     EntireEntry ee = trace.readNextEntry();
 
     std::unordered_set<uint64_t> current_pages;
@@ -83,11 +84,12 @@ double timing) {
     uint64_t hits = 0;
 
     double start_time = ee.eh.time * 1000; // seconds to ms
+    uint64_t num_pages_moved;
     std::unordered_map<uint64_t, uint64_t> hits_in_current_time;
 
     while (ee.valid) {
 
-        if (ee.eh.time * 1000 - start_time > timing) {
+        if (ee.eh.time * 1000 - start_time > scale*timing) {
             uint64_t least_accesses = -1;
             uint64_t victim_page;
             for (auto& page: current_pages) {
@@ -111,6 +113,7 @@ double timing) {
                 }
             }
             current_pages.insert(promoted_page);
+            num_pages_moved++;
             hits_in_current_time.clear();
             start_time = ee.eh.time * 1000;
         
@@ -134,7 +137,8 @@ double timing) {
         ee = trace.readNextEntry();
     }
 
-    fprintf(outfile, "%ld %ld %ld %ld %f\n", total_pages, timing, hits, misses,
+    fprintf(outfile, "%ld %d %lu %ld %ld %f\n", total_pages, timing,
+    num_pages_moved, hits, misses,
     ((double)misses/(double(hits+misses))));
 
 } 
@@ -142,13 +146,13 @@ double timing) {
 int main(int argc, char* argv[]) {
 
     if (argc < 5) {
-        std::cerr << "./lfu tracefile outputfile scale numpages..numpages" << std::endl;
+        std::cerr << "./lfu tracefile outputfile time_scale numpages..numpages" << std::endl;
         return 1;
     }
 
     trace.setTraceFile(argv[1]);
 
-//     auto initial_mapping = aggregatePages();
+    auto initial_mapping = aggregatePages();
 
     outfile = fopen(argv[2], "w");
     if (!outfile) {
@@ -158,18 +162,17 @@ int main(int argc, char* argv[]) {
     }
 
     double scale = std::stof(argv[3]);
+
     int arg_num = 4;
     std::vector<int> page_mvmt_speeds{10, 100, 1000, 5000, 10000, 100000}; // 1 page mvmt per x ms
     while (arg_num < argc) {
         uint64_t page_limit = atoi(argv[arg_num]);
-        std::vector<uint64_t> starting_pages = getStartingRandom( page_limit);
+        std::vector<uint64_t> starting_pages = getStartingPages(initial_mapping, page_limit);
         for (const auto timing : page_mvmt_speeds) {
             trace = TraceFile();
             trace.setTraceFile(argv[1]); // reset to run through again
 
-            fprintf(stderr, "starting lfu with %d, %lu\n", timing, page_limit);
-
-            dynamicLFU(starting_pages, page_limit, scale*timing);
+            dynamicLFU(starting_pages, page_limit, timing, scale);
         }
         arg_num++;
     }

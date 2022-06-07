@@ -19,18 +19,29 @@ scale=("63.5" "30" "44" "35" "102.8")
 #     ./first_seen_pebs ../../traces/memtrace-${myFiles[$i]}.out traces/new_ad_${myFiles[$i]}.out ad_out/fifo_${myFiles[$i]}_50 ${pages[$i]}
 # done
 
-for i in {0..4}; #dynamin_lfu_pebs
-do 
-    ./dynamic_lfu_ad ../../traces/memtrace-${myFiles[$i]}.out ad_out/dlfu_${myFiles[$i]}_50 1 1 ${scale[$i]}  ${pages[$i]} 
-done
+# for i in {0..4}; #dynamin_lfu_pebs
+# do 
+#     ./dynamic_lfu_ad ../../traces/memtrace-${myFiles[$i]}.out ad_out/dlfu_${myFiles[$i]}_50 1 1 ${scale[$i]}  ${pages[$i]} 
+# done
+# 
+# for i in {0..4}; #dynamin_lfu_fifo_pebs
+# do 
+#     ./dynamic_lfu_fifo_ad ../../traces/memtrace-${myFiles[$i]}.out ad_out/dlfu_fifo_${myFiles[$i]}_50 1 1 ${scale[$i]}  ${pages[$i]} 
+# done
+# 
+# for i in {0..4}; #dynamin_lfu_random_pebs
+# do 
+#     ./dynamic_lfu_random_ad ../../traces/memtrace-${myFiles[$i]}.out ad_out/dlfu_random_${myFiles[$i]}_50 1 1 ${scale[$i]}  ${pages[$i]} 
+# done
 
-for i in {0..4}; #dynamin_lfu_fifo_pebs
-do 
-    ./dynamic_lfu_fifo_ad ../../traces/memtrace-${myFiles[$i]}.out ad_out/dlfu_fifo_${myFiles[$i]}_50 1 1 ${scale[$i]}  ${pages[$i]} 
-done
+./dynamic_lfu_ad ../../traces/memtrace-503.out ad_out/dlfu_503_50 1 5 63.5 111625 &
+./dynamic_lfu_ad ../../traces/memtrace-505.out ad_out/dlfu_505_50 1 5 30 86004 &
+./dynamic_lfu_ad ../../traces/memtrace-519.out ad_out/dlfu_519_50 1 5 44 52394 &
+./dynamic_lfu_ad ../../traces/memtrace-557cld.out ad_out/dlfu_557cld_50 1 5 36 101975 &
+./dynamic_lfu_ad ../../traces/memtrace-602.out ad_out/dlfu_602_50 1 5 102.8 982349 &
 
-for i in {0..4}; #dynamin_lfu_random_pebs
-do 
-    ./dynamic_lfu_random_ad ../../traces/memtrace-${myFiles[$i]}.out ad_out/dlfu_random_${myFiles[$i]}_50 1 1 ${scale[$i]}  ${pages[$i]} 
-done
-
+./dynamic_lfu_fifo_ad ../../traces/memtrace-503.out ad_out/dlfu_fifo_503_50 1 5 63.5 111625 &
+./dynamic_lfu_fifo_ad ../../traces/memtrace-505.out ad_out/dlfu_fifo_505_50 1 5 30 86004 &
+./dynamic_lfu_fifo_ad ../../traces/memtrace-519.out ad_out/dlfu_fifo_519_50 1 5 44 52394 &
+./dynamic_lfu_fifo_ad ../../traces/memtrace-557cld.out ad_out/dlfu_fifo_557cld_50 1 5 36 101975 &
+./dynamic_lfu_fifo_ad ../../traces/memtrace-602.out ad_out/dlfu_fifo_602_50 1 5 102.8 982349 &

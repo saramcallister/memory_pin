@@ -34,8 +34,14 @@ scale=("63.5" "30" "44" "35" "102.8")
 #     ./dynamic_lfu_random_ad ../../traces/memtrace-${myFiles[$i]}.out ad_out/dlfu_random_${myFiles[$i]}_25 1 1 ${scale[$i]}  ${pages[$i]}
 # done
 
-./dynamic_lfu_ad ../../traces/memtrace-503.out ad_out/dlfu_503_25 1 5 63.5 55812 
-./dynamic_lfu_ad ../../traces/memtrace-505.out ad_out/dlfu_505_25 1 5 30 43002 
-./dynamic_lfu_ad ../../traces/memtrace-519.out ad_out/dlfu_519_25 1 5 44 26197 
-./dynamic_lfu_ad ../../traces/memtrace-557cld.out ad_out/dlfu_557cld 1 5 36 50987 
-./dynamic_lfu_ad ../../traces/memtrace-602.out ad_out/dlfu_602_25 1 5 102.8 49117 
+./dynamic_lfu_ad ../../traces/memtrace-503.out ad_out/dlfu_503_25 1 5 63.5 55812 &
+./dynamic_lfu_ad ../../traces/memtrace-505.out ad_out/dlfu_505_25 1 5 30 43002 & 
+./dynamic_lfu_ad ../../traces/memtrace-519.out ad_out/dlfu_519_25 1 5 44 26197 &
+./dynamic_lfu_ad ../../traces/memtrace-557cld.out ad_out/dlfu_557cld_25 1 5 36 50987 & 
+./dynamic_lfu_ad ../../traces/memtrace-602.out ad_out/dlfu_602_25 1 5 102.8 49117 &
+
+./dynamic_lfu_fifo_ad ../../traces/memtrace-503.out ad_out/dlfu_fifo_503_25 1 5 63.5 55812 &
+./dynamic_lfu_fifo_ad ../../traces/memtrace-505.out ad_out/dlfu_fifo_505_25 1 5 30 43002 &
+./dynamic_lfu_fifo_ad ../../traces/memtrace-519.out ad_out/dlfu_fifo_519_25 1 5 44 26197 &
+./dynamic_lfu_fifo_ad ../../traces/memtrace-557cld.out ad_out/dlfu_fifo_557cld_25 1 5 36 50987 &
+./dynamic_lfu_fifo_ad ../../traces/memtrace-602.out ad_out/dlfu_fifo_602_25 1 5 102.8 49117 &

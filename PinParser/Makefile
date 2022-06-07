@@ -4,6 +4,7 @@ SRC=./src
 
 all: lfu \
 	dynamic_lfu \
+	dynamic_lfu_debug \
 	dynamic_lfu_random \
 	dynamic_lfu_fifo \
 	working_set_size \
@@ -77,6 +78,9 @@ hfa: parser.o hotness_vs_first_access.o
 
 dynamic_lfu: parser.o dynamic_lfu.o 
 	$(CXX) -o dynamic_lfu dynamic_lfu.o parser.o
+
+dynamic_lfu_debug: parser.o dynamic_lfu_debug.o 
+	$(CXX) -o dynamic_lfu_debug dynamic_lfu_debug.o parser.o
 
 dynamic_lfu_random: parser.o dynamic_lfu_random.o 
 	$(CXX) -o dynamic_lfu_random dynamic_lfu_random.o parser.o
