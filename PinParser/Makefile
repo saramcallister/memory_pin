@@ -28,7 +28,10 @@ all: lfu \
     count_pages \
     dynamic_lfu_ad \
     dynamic_lfu_random_ad \
-    dynamic_lfu_fifo_ad 
+    dynamic_lfu_fifo_ad \
+    hw_hotness \
+    dynamic_lfu_hw
+
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
@@ -41,6 +44,9 @@ lfu_pebs: parser.o lfu_pebs.o
 
 pebs: parser.o pebs.o 
 	$(CXX) -o pebs pebs.o parser.o
+    
+hw_hotness: parser.o hw_hotness.o 
+	$(CXX) -o hw_hotness hw_hotness.o parser.o
 
 pebs_gen: parser.o pebs_gen.o 
 	$(CXX) -o pebs_gen pebs_gen.o parser.o
@@ -81,6 +87,9 @@ dynamic_lfu_fifo: parser.o dynamic_lfu_fifo.o
 dynamic_lfu_pebs: parser.o dynamic_lfu_pebs.o 
 	$(CXX) -o dynamic_lfu_pebs dynamic_lfu_pebs.o parser.o
 
+dynamic_lfu_hw: parser.o dynamic_lfu_hw.o 
+	$(CXX) -o dynamic_lfu_hw dynamic_lfu_hw.o parser.o
+
 dynamic_lfu_ad: parser.o dynamic_lfu_ad.o 
 	$(CXX) -o dynamic_lfu_ad dynamic_lfu_ad.o parser.o
 
@@ -111,58 +120,62 @@ compare: parser.o compare.o
 pagemap_read: pagemap_read.o
 	$(CXX) -o pagemap_read pagemap_read.o
 
-lfu.o: $(SRC)/lfu.cpp $(SRC)/parser.hpp
+lfu.o: lfu.cpp parser.hpp
 
-count_pages.o: $(SRC)/count_pages.cpp $(SRC)/parser.hpp
+count_pages.o: count_pages.cpp parser.hpp
 
-lfu_pebs.o: $(SRC)/lfu_pebs.cpp $(SRC)/parser.hpp
+lfu_pebs.o: lfu_pebs.cpp parser.hpp
 
-pebs.o: $(SRC)/pebs.cpp $(SRC)/parser.hpp
+pebs.o: pebs.cpp parser.hpp
 
-pebs_gen.o: $(SRC)/pebs_gen.cpp $(SRC)/parser.hpp
+hw_hotness.o: hw_hotness.cpp parser.hpp
 
-ad.o: $(SRC)/ad.cpp $(SRC)/parser.hpp
+pebs_gen.o: pebs_gen.cpp parser.hpp
 
-ad_gen.o: $(SRC)/ad_gen.cpp $(SRC)/parser.hpp
+ad.o: ad.cpp parser.hpp
 
-goanna0.o: $(SRC)/goanna0.cpp $(SRC)/parser.hpp
+ad_gen.o: ad_gen.cpp parser.hpp
 
-first_seen.o: $(SRC)/first_seen.cpp $(SRC)/parser.hpp
+goanna0.o: goanna0.cpp parser.hpp
 
-first_seen_pebs.o: $(SRC)/first_seen_pebs.cpp $(SRC)/parser.hpp
+first_seen.o: first_seen.cpp parser.hpp
 
-random.o: $(SRC)/random.cpp $(SRC)/parser.hpp
+first_seen_pebs.o: first_seen_pebs.cpp parser.hpp
 
-random_pebs.o: $(SRC)/random_pebs.cpp $(SRC)/parser.hpp
+random.o: random.cpp parser.hpp
 
-dynamic_lfu.o: $(SRC)/dynamic_lfu.cpp $(SRC)/parser.hpp
+random_pebs.o: random_pebs.cpp parser.hpp
 
-dynamic_lfu_random.o: $(SRC)/dynamic_lfu_random.cpp $(SRC)/parser.hpp
+dynamic_lfu.o: dynamic_lfu.cpp parser.hpp
 
-dynamic_lfu_fifo.o: $(SRC)/dynamic_lfu_fifo.cpp $(SRC)/parser.hpp
+dynamic_lfu_random.o: dynamic_lfu_random.cpp parser.hpp
 
-dynamic_lfu_pebs.o: $(SRC)/dynamic_lfu_pebs.cpp $(SRC)/parser.hpp
+dynamic_lfu_fifo.o: dynamic_lfu_fifo.cpp parser.hpp
 
-dynamic_lfu_ad.o: $(SRC)/dynamic_lfu_ad.cpp $(SRC)/parser.hpp
+dynamic_lfu_pebs.o: dynamic_lfu_pebs.cpp parser.hpp
 
-dynamic_lfu_fifo_ad.o: $(SRC)/dynamic_lfu_fifo_ad.cpp $(SRC)/parser.hpp
+dynamic_lfu_hw.o: dynamic_lfu_hw.cpp parser.hpp
 
-dynamic_lfu_random_ad.o: $(SRC)/dynamic_lfu_random_ad.cpp $(SRC)/parser.hpp
+dynamic_lfu_ad.o: dynamic_lfu_ad.cpp parser.hpp
 
-dynamic_lfu_random_pebs.o: $(SRC)/dynamic_lfu_random_pebs.cpp $(SRC)/parser.hpp
+dynamic_lfu_fifo_ad.o: dynamic_lfu_fifo_ad.cpp parser.hpp
 
-dynamic_lfu_fifo_pebs.o: $(SRC)/dynamic_lfu_fifo_pebs.cpp $(SRC)/parser.hpp
+dynamic_lfu_random_ad.o: dynamic_lfu_random_ad.cpp parser.hpp
 
-working_set_size.o: $(SRC)/working_set_size.cpp $(SRC)/parser.hpp
+dynamic_lfu_random_pebs.o: dynamic_lfu_random_pebs.cpp parser.hpp
 
-hotness_vs_first_access.o: $(SRC)/hotness_vs_first_access.cpp $(SRC)/parser.hpp
+dynamic_lfu_fifo_pebs.o: dynamic_lfu_fifo_pebs.cpp parser.hpp
 
-segmented_lfu.o: $(SRC)/segmented_lfu.cpp $(SRC)/parser.hpp
+working_set_size.o: working_set_size.cpp parser.hpp
 
-create_slfu_file.o: $(SRC)/create_slfu_file.cpp $(SRC)/parser.hpp
+hotness_vs_first_access.o: hotness_vs_first_access.cpp parser.hpp
 
-parser.o: $(SRC)/parser.cpp $(SRC)/parser.hpp
+segmented_lfu.o: segmented_lfu.cpp parser.hpp
 
-compare.o: $(SRC)/compare.cpp $(SRC)/parser.hpp
+create_slfu_file.o: create_slfu_file.cpp parser.hpp
 
-pagemap_read.o: $(SRC)/pagemap_read.cpp
+parser.o: parser.cpp parser.hpp
+
+compare.o: compare.cpp parser.hpp
+
+pagemap_read.o: pagemap_read.cpp
