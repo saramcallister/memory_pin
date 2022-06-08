@@ -15,7 +15,7 @@ parser.add_argument('file_name', type=str, default="")
 
 args = parser.parse_args()
 
-def graph(data, times,graph_name):
+def graph(data, graph_name):
 
 
     fig, ax = plt.subplots(nrows=1, ncols=1)
@@ -26,9 +26,9 @@ def graph(data, times,graph_name):
     colors = [cmap(2*i) for i in range(10)]
 
     for i in range(10):
-        ax.plot(times[i], data[i], color=colors[i], label=num2words(i+1))
+        ax.plot( data[i], color=colors[i], label=num2words(i+1))
     plt.legend(loc="upper left")
-    plt.set_ylim(0,1)
+    plt.ylim(0,1)
 
     plt.savefig(graph_name) 
 
@@ -43,18 +43,17 @@ def main():
 #     print(args)
     for fname in args.input_files:
         f = open(fname)
+        index = int(fname[-1])
+        if(index == 0):
+            index = 10
         lines = f.readlines() 
 
         for i in range(0, len(lines)):
             line = lines[i].split(' ')
-            if line[0] == 'bit' and line[1] == 'number:':
-                index = int(line[2]) - 1
-                next_line = lines[i+1].split(' ')
+            if line[0] == 'ad' and line[1] == 'could':
+                data[index-1].append(float(line[3]))
 
-                data[index].append(float(next_line[3]))
-                times[index].append(float(line[4]))
-
-    graph(data,times, args.file_name)
+    graph(data, args.file_name)
 
 
 main()

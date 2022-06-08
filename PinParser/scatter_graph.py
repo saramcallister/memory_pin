@@ -15,7 +15,7 @@ parser.add_argument('file_name', type=str, default="")
 
 args = parser.parse_args()
 
-def scatter(data, times,graph_name, rows, cols):
+def scatter(data, graph_name, rows, cols):
 
     fig, ax = plt.subplots(nrows=rows, ncols=cols)
     plt.ylabel("fraction accuracy")
@@ -26,8 +26,7 @@ def scatter(data, times,graph_name, rows, cols):
 
     for i in range(rows):
         for j in range(cols):
-            ax[i,j].scatter(times[(i*cols)+j], data[(i*cols)+j],
-            color=colors[(i*cols)+j], label=num2words((i*cols)+j+1))
+            ax[i,j].scatter(range(len(data[(i*cols)+j])),data[(i*cols)+j], color=colors[(i*cols)+j], label=num2words((i*cols)+j+1))
             ax[i,j].legend(loc="upper left")
             ax[i,j].set_ylabel("fraction accuracy")
             ax[i,j].set_xlabel("Time")
@@ -47,17 +46,19 @@ def main():
     for fname in args.input_files:
         f = open(fname)
         lines = f.readlines() 
+        index = int(fname[-1])
+        if(index == 0):
+            index = 10
+
+#         print(fname)
 
         for i in range(0, len(lines)):
             line = lines[i].split(' ')
-            if line[0] == 'bit' and line[1] == 'number:':
-                index = int(line[2]) - 1
-                next_line = lines[i+1].split(' ')
+            if line[0] == 'ad' and line[1] == 'could':
+                data[index-1].append(float(line[3]))
+#                 print("appending " + line[3])
 
-                data[index].append(float(next_line[3]))
-                times[index].append(float(line[4]))
-
-    scatter(data,times, args.file_name, 2, int(len(args.input_files)/2))
+    scatter(data,args.file_name, 2, int(len(args.input_files)/2))
 
 
 

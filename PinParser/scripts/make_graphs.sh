@@ -23,8 +23,6 @@ else
     python3 graph_pebs.py 505/pebs/* graphs/505_pebs
     python3 graph_pebs.py 519/pebs/* graphs/519_pebs
     python3 graph_pebs.py 557/cld/pebs/* graphs/557_cld_pebs
-    python3 graph_pebs.py 557/input/pebs/* graphs/557_input_pebs
-    python3 graph_pebs.py 557/cpu2006/pebs/* graphs/557_cpu2006_pebs
     python3 graph_pebs.py 602/pebs/* graphs/602_pebs
 
     tar -cvzf pebs_graphs.tar.gz graphs/*_pebs.png
