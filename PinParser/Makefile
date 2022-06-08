@@ -31,11 +31,23 @@ all: lfu \
     dynamic_lfu_random_ad \
     dynamic_lfu_fifo_ad \
     hw_hotness \
-    dynamic_lfu_hw
+    dynamic_lfu_hw \
+    lru \
+    lru_pebs \
+    lru_hw
 
 
 lfu: parser.o lfu.o 
 	$(CXX) -o lfu lfu.o parser.o
+
+lru: parser.o lru.o 
+	$(CXX) -o lru lru.o parser.o
+
+lru_hw: parser.o lru_hw.o 
+	$(CXX) -o lru_hw lru_hw.o parser.o
+
+lru_pebs: parser.o lru_pebs.o 
+	$(CXX) -o lru_pebs lru_pebs.o parser.o
 
 count_pages: parser.o count_pages.o 
 	$(CXX) -o count_pages count_pages.o parser.o
@@ -125,6 +137,12 @@ pagemap_read: pagemap_read.o
 	$(CXX) -o pagemap_read pagemap_read.o
 
 lfu.o: lfu.cpp parser.hpp
+
+lru.o: lru.cpp parser.hpp
+
+lru_pebs.o: lru_pebs.cpp parser.hpp
+
+lru_hw.o: lru_hw.cpp parser.hpp
 
 count_pages.o: count_pages.cpp parser.hpp
 
