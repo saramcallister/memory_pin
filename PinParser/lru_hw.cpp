@@ -189,7 +189,7 @@ int main(int argc, char* argv[]) {
 
     int arg_num = 4;
 //     std::vector<int> page_mvmt_speeds{10, 100, 1000, 5000, 10000, 100000}; // 1 page mvmt per x ms
-    std::vector<int> page_mvmt_speeds{100}; // 1 page mvmt per x us
+    std::vector<int> page_mvmt_speeds{100, 1000, 10000}; // 1 page mvmt per x us
     while (arg_num < argc) {
         uint64_t page_limit = atoi(argv[arg_num]);
         std::vector<uint64_t> starting_pages = getStartingPages(initial_mapping, page_limit);

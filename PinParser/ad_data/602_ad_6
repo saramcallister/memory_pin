@@ -1,0 +1,14 @@
+percent hot pages: 0.500000
+num_bits: 6
+time_scale: 102.800003
+sample_time: 5
+ad could identify 0.999999 of the top 50.000000% pages
+pg_count: 910970, sorted_truth.size(): 1821941, sorted_ad.size(): 1821941
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 470264, sorted_truth.size(): 940528, sorted_ad.size(): 940528
+ad could identify 0.941661 of the top 50.000000% pages
+pg_count: 838672, sorted_truth.size(): 1781261, sorted_ad.size(): 1781261
+ad could identify 0.999997 of the top 50.000000% pages
+pg_count: 167686, sorted_truth.size(): 335373, sorted_ad.size(): 335373
+ad could identify 0.999997 of the top 50.000000% pages
+pg_count: 186963, sorted_truth.size(): 373927, sorted_ad.size(): 373927

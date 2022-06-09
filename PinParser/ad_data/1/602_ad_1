@@ -1,0 +1,68 @@
+percent hot pages: 0.500000
+num_bits: 1
+time_scale: 102.800003
+sample_time: 5
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 100156, sorted_truth.size(): 200313, sorted_ad.size(): 200313
+ad could identify 0.999999 of the top 50.000000% pages
+pg_count: 858813, sorted_truth.size(): 1717627, sorted_ad.size(): 1717627
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 97901, sorted_truth.size(): 195803, sorted_ad.size(): 195803
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 71071, sorted_truth.size(): 142142, sorted_ad.size(): 142142
+ad could identify 0.999993 of the top 50.000000% pages
+pg_count: 67064, sorted_truth.size(): 134129, sorted_ad.size(): 134129
+ad could identify 0.999997 of the top 50.000000% pages
+pg_count: 152027, sorted_truth.size(): 304055, sorted_ad.size(): 304055
+ad could identify 0.999997 of the top 50.000000% pages
+pg_count: 161088, sorted_truth.size(): 322177, sorted_ad.size(): 322177
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 180242, sorted_truth.size(): 360484, sorted_ad.size(): 360484
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 186240, sorted_truth.size(): 372480, sorted_ad.size(): 372480
+ad could identify 0.999998 of the top 50.000000% pages
+pg_count: 214932, sorted_truth.size(): 429865, sorted_ad.size(): 429865
+ad could identify 0.999998 of the top 50.000000% pages
+pg_count: 226790, sorted_truth.size(): 453581, sorted_ad.size(): 453581
+ad could identify 0.999998 of the top 50.000000% pages
+pg_count: 262205, sorted_truth.size(): 524411, sorted_ad.size(): 524411
+ad could identify 0.999998 of the top 50.000000% pages
+pg_count: 259496, sorted_truth.size(): 518993, sorted_ad.size(): 518993
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 283003, sorted_truth.size(): 566006, sorted_ad.size(): 566006
+ad could identify 0.999999 of the top 50.000000% pages
+pg_count: 590730, sorted_truth.size(): 1181461, sorted_ad.size(): 1181461
+ad could identify 0.999998 of the top 50.000000% pages
+pg_count: 324437, sorted_truth.size(): 648875, sorted_ad.size(): 648875
+ad could identify 0.999998 of the top 50.000000% pages
+pg_count: 316615, sorted_truth.size(): 633231, sorted_ad.size(): 633231
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 890625, sorted_truth.size(): 1781250, sorted_ad.size(): 1781250
+ad could identify 0.999988 of the top 50.000000% pages
+pg_count: 41467, sorted_truth.size(): 82935, sorted_ad.size(): 82935
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 54063, sorted_truth.size(): 108126, sorted_ad.size(): 108126
+ad could identify 0.999991 of the top 50.000000% pages
+pg_count: 57700, sorted_truth.size(): 115401, sorted_ad.size(): 115401
+ad could identify 0.999992 of the top 50.000000% pages
+pg_count: 61774, sorted_truth.size(): 123549, sorted_ad.size(): 123549
+ad could identify 0.999986 of the top 50.000000% pages
+pg_count: 36474, sorted_truth.size(): 72949, sorted_ad.size(): 72949
+ad could identify 0.999991 of the top 50.000000% pages
+pg_count: 57917, sorted_truth.size(): 115835, sorted_ad.size(): 115835
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 72022, sorted_truth.size(): 144044, sorted_ad.size(): 144044
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 80851, sorted_truth.size(): 161702, sorted_ad.size(): 161702
+ad could identify 0.999986 of the top 50.000000% pages
+pg_count: 36896, sorted_truth.size(): 73793, sorted_ad.size(): 73793
+ad could identify 0.999992 of the top 50.000000% pages
+pg_count: 64740, sorted_truth.size(): 129481, sorted_ad.size(): 129481
+ad could identify 0.999992 of the top 50.000000% pages
+pg_count: 65558, sorted_truth.size(): 131117, sorted_ad.size(): 131117
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 65013, sorted_truth.size(): 130026, sorted_ad.size(): 130026
+ad could identify 0.999993 of the top 50.000000% pages
+pg_count: 66856, sorted_truth.size(): 133713, sorted_ad.size(): 133713
+ad could identify 0.999994 of the top 50.000000% pages
+pg_count: 78931, sorted_truth.size(): 157863, sorted_ad.size(): 157863

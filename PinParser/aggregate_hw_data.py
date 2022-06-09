@@ -9,23 +9,35 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('input_files', type=str, nargs="+")
+parser.add_argument('graph_name', type=str)
 args = parser.parse_args()
 
-def graph(data, fname):
+def graph(data, names):
     fig, ax = plt.subplots(nrows=1,ncols=1)
-    plt.ylabel("percent hot pages identified")
-    plt.xlabel("intervals")
+    plt.ylabel("percent accuracy")
+    plt.xlabel("time")
 
-    plt.plot(data)
+    cmap = plt.get_cmap('tab20')
+    colors = [cmap(2*i) for i in range(10)]
 
-    plt.savefig(os.path.basename(fname))
+    for i in range(len(data)):
+        plt.plot(data[i], color=colors[i], label=names[i])
+
+    plt.legend(loc="upper right")
+#     plt.ylim(0,1)
+
+
+    plt.savefig(args.graph_name)
 
 def main():
+
+    data = [[] for i in range(len(args.input_files))]
+    names = []
+    index = 0
     
     for fname in args.input_files:
         f=open(fname)
         aggregate = 0
-        data = []
 
         lines = f.readlines()
 
@@ -34,10 +46,14 @@ def main():
 
             if(line[0] == 'hotness' and line[1] == 'mechanism'):
                 aggregate+= float(line[4])
-                data.append(float(line[4]))
+                data[index].append(float(line[4]))
 
         print("average error for %s is %5.2f" % (fname, (aggregate/len(lines))))
-        graph(data, fname)
+        names.append(fname[0:3])
+        index+=1
+#         graph(data, fname)
+
+    graph(data, names)
 
 main()
 

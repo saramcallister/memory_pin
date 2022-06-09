@@ -35,43 +35,32 @@ def graph(data, times,names,graph_name):
 
 def main(): 
     
-#     data=[]
-#     times=[]
-# 
-#     f = open(args.input_file)
-#     lines = f.readlines() 
-# 
-#     for i in range(0, len(lines)):
-#         line = lines[i].split(' ')
-#         if line[0] == 'time:' :
-#             next_line = lines[i+1].split(' ')
-# 
-#             data.append(float(next_line[3]))
-#             times.append(float(line[1]))
-# 
-#     graph(data,times, args.graph_file)
-    data = [[] for i in range(len(args.input_files))]
-    times = [[] for i in range(len(args.input_files))]
+    data = [[] for i in range(1*len(args.input_files))]
+    times = [[] for i in range(1*len(args.input_files))]
     names = []
 
 
-#     print(args)
     index = 0
     for fname in args.input_files:
         f = open(fname)
         lines = f.readlines() 
 
-        for i in range(0, len(lines)):
-            line = lines[i].split(' ')
-#             if line[0] == 'bit' and line[1] == 'number:':
-#                 index = int(line[2]) - 1
-#                 next_line = lines[i+1].split(' ')
+#         for i in range(0, int(len(lines)/2)):
+#             line = lines[i].split(' ')
+# 
+#             data[index].append(float(line[5]))
+#             times[index].append(float(line[1]))
+#         names.append(fname+"_25")
+#         index += 1
 
-            data[index].append(float(line[4]))
+        for i in range(int(len(lines)/2), len(lines)):
+            line = lines[i].split(' ')
+
+            data[index].append(float(line[5]))
             times[index].append(float(line[1]))
         names.append(fname)
-
         index += 1
+
 
     graph(data,times, names, args.graph_file)
 

@@ -1,0 +1,8 @@
+percent hot pages: 0.500000
+num_bits: 10
+time_scale: 35.000000
+sample_time: 5
+ad could identify 0.797747 of the top 50.000000% pages
+pg_count: 80537, sorted_truth.size(): 201911, sorted_ad.size(): 201911
+ad could identify 0.999980 of the top 50.000000% pages
+pg_count: 24805, sorted_truth.size(): 49611, sorted_ad.size(): 49611

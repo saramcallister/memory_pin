@@ -1,0 +1,44 @@
+percent hot pages: 0.500000
+num_bits: 2
+time_scale: 63.500000
+sample_time: 5
+ad could identify 0.952532 of the top 50.000000% pages
+pg_count: 106325, sorted_truth.size(): 223247, sorted_ad.size(): 223247
+ad could identify 0.999633 of the top 50.000000% pages
+pg_count: 104909, sorted_truth.size(): 209895, sorted_ad.size(): 209895
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104947, sorted_truth.size(): 209895, sorted_ad.size(): 209895
+ad could identify 0.649325 of the top 50.000000% pages
+pg_count: 68145, sorted_truth.size(): 209895, sorted_ad.size(): 209895
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104947, sorted_truth.size(): 209895, sorted_ad.size(): 209895
+ad could identify 0.996141 of the top 50.000000% pages
+pg_count: 104543, sorted_truth.size(): 209896, sorted_ad.size(): 209896
+ad could identify 0.999638 of the top 50.000000% pages
+pg_count: 104910, sorted_truth.size(): 209896, sorted_ad.size(): 209896
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209896, sorted_ad.size(): 209896
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209896, sorted_ad.size(): 209896
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209896, sorted_ad.size(): 209896
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209896, sorted_ad.size(): 209896
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209897, sorted_ad.size(): 209897
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209897, sorted_ad.size(): 209897
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209896, sorted_ad.size(): 209896
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209896, sorted_ad.size(): 209896
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104947, sorted_truth.size(): 209895, sorted_ad.size(): 209895
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209897, sorted_ad.size(): 209897
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209897, sorted_ad.size(): 209897
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209897, sorted_ad.size(): 209897
+ad could identify 0.999995 of the top 50.000000% pages
+pg_count: 104948, sorted_truth.size(): 209897, sorted_ad.size(): 209897

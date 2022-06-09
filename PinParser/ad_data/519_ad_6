@@ -1,0 +1,24 @@
+percent hot pages: 0.500000
+num_bits: 6
+time_scale: 44.000000
+sample_time: 5
+ad could identify 0.999933 of the top 50.000000% pages
+pg_count: 52391, sorted_truth.size(): 104789, sorted_ad.size(): 104789
+ad could identify 0.999990 of the top 50.000000% pages
+pg_count: 51581, sorted_truth.size(): 103163, sorted_ad.size(): 103163
+ad could identify 0.999990 of the top 50.000000% pages
+pg_count: 51581, sorted_truth.size(): 103163, sorted_ad.size(): 103163
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 51582, sorted_truth.size(): 103164, sorted_ad.size(): 103164
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 51582, sorted_truth.size(): 103164, sorted_ad.size(): 103164
+ad could identify 0.999990 of the top 50.000000% pages
+pg_count: 51581, sorted_truth.size(): 103163, sorted_ad.size(): 103163
+ad could identify 0.999990 of the top 50.000000% pages
+pg_count: 51581, sorted_truth.size(): 103163, sorted_ad.size(): 103163
+ad could identify 0.999990 of the top 50.000000% pages
+pg_count: 51581, sorted_truth.size(): 103163, sorted_ad.size(): 103163
+ad could identify 1.000000 of the top 50.000000% pages
+pg_count: 51582, sorted_truth.size(): 103164, sorted_ad.size(): 103164
+ad could identify 0.999990 of the top 50.000000% pages
+pg_count: 51581, sorted_truth.size(): 103163, sorted_ad.size(): 103163
